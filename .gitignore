@@ -40,7 +40,20 @@ next-env.d.ts
 *.tfstate*
 .terraform.lock.hcl
 
-# secrets
+# Secrets and Credentials
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.json-key
+service-account-key.json
+gcp-sa-key.json
 GCP_SA_KEY
 GCP_SA_KEY.json
-.env*.local
+
+# Terraform Secrets
+**/*.tfvars
+**/*.tfvars.json
+terraform.tfstate*
+.terraform.lock.hcl

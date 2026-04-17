@@ -14,9 +14,10 @@ spec:
         run.googleapis.com/vpc-access-connector: crowdflow-connector
         run.googleapis.com/vpc-access-egress: all-traffic
     spec:
+      serviceAccountName: crowdflow-runner@prompt-wars-493611.iam.gserviceaccount.com
       containerConcurrency: 80
       containers:
-      - image: us-east1-docker.pkg.dev/prompt-wars-493611/crowdflow/platform:latest
+      - image: asia-south1-docker.pkg.dev/prompt-wars-493611/crowdflow/platform:latest
         ports:
         - containerPort: 8080
         resources:

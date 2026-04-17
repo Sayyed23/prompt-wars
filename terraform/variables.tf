@@ -5,9 +5,8 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "The GCP region"
-  type        = string
-  default     = "us-east1"
+  description = "The GCP region to deploy resources to"
+  default     = "asia-south1" # Optimized for low latency in the South Asia region
 }
 
 variable "db_password" {

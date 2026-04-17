@@ -6,7 +6,20 @@ node_modules
 LICENSE
 .gitignore
 .dockerignore
-.env.local
-.env.local.template
-.kiro
+# Secrets and Keys - target private keys only to avoid excluding public certs
+.env*
+GCP_SA_KEY
+GCP_SA_KEY.json
+gcp-sa-key.json
+*.key.pem
+*_private.key
+secrets/*
+certs/private/*
+
+# Infrastructure
 terraform
+.terraform
+*.tfstate*
+
+# KI and internal files
+.kiro

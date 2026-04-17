@@ -3,6 +3,62 @@ provider "google" {
   region  = var.region
 }
 
+# 1. Dedicated Service Account for Cloud Run
+resource "google_service_account" "crowdflow_runner" {
+  account_id   = "crowdflow-runner"
+  display_name = "CrowdFlow Cloud Run Runner"
+}
+
+# 2. IAM Roles for the Runner
+resource "google_project_iam_member" "sql_client" {
+  project = var.project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.crowdflow_runner.email}"
+}
+
+
+
+# 3. Secret Manager Scaffolding (Values to be populated manually)
+resource "google_secret_manager_secret" "db_url" {
+  secret_id = "DATABASE_URL"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret" "redis_url" {
+  secret_id = "REDIS_URL"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret" "gemini_api_key" {
+  secret_id = "GEMINI_API_KEY"
+  replication {
+    auto {}
+  }
+}
+
+# 4. Access to Secrets
+resource "google_secret_manager_secret_iam_member" "db_url_access" {
+  secret_id = google_secret_manager_secret.db_url.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.crowdflow_runner.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "redis_url_access" {
+  secret_id = google_secret_manager_secret.redis_url.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.crowdflow_runner.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "gemini_api_key_access" {
+  secret_id = google_secret_manager_secret.gemini_api_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.crowdflow_runner.email}"
+}
+
 # Artifact Registry for Docker images
 resource "google_artifact_registry_repository" "crowdflow_repo" {
   location      = var.region
@@ -72,13 +128,14 @@ resource "google_sql_user" "users" {
   password = var.db_password
 }
 
-# Cloud Run Service (simplified, usually updated via CI/CD)
+# Cloud Run Service
 resource "google_cloud_run_v2_service" "crowdflow_service" {
   name     = "crowdflow-platform"
   location = var.region
   ingress  = "INGRESS_TRAFFIC_ALL"
 
   template {
+    service_account = google_service_account.crowdflow_runner.email
     scaling {
       min_instance_count = 2
       max_instance_count = 100
@@ -88,14 +145,40 @@ resource "google_cloud_run_v2_service" "crowdflow_service" {
       egress    = "ALL_TRAFFIC"
     }
     containers {
-      image = "us-east1-docker.pkg.dev/${var.project_id}/crowdflow/platform:latest"
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/crowdflow/platform:latest"
+      env {
+        name = "DATABASE_URL"
+        value_source {
+          secret_key_ref {
+            secret  = "DATABASE_URL"
+            version = "latest"
+          }
+        }
+      }
+      env {
+        name = "REDIS_URL"
+        value_source {
+          secret_key_ref {
+            secret  = "REDIS_URL"
+            version = "latest"
+          }
+        }
+      }
+      env {
+        name = "GEMINI_API_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = "GEMINI_API_KEY"
+            version = "latest"
+          }
+        }
+      }
       resources {
         limits = {
           cpu    = "2"
           memory = "2Gi"
         }
       }
-      # Environment variables and Secrets are bound via cloudrun.yaml or manually as per user request
     }
   }
 
@@ -111,17 +194,14 @@ resource "google_cloud_run_v2_service" "crowdflow_service" {
   }
 }
 
-# IAM for Cloud Run to access secrets
-resource "google_project_iam_member" "cloudrun_secret_accessor" {
-  project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${google_cloud_run_v2_service.crowdflow_service.template[0].service_account}"
-}
-
 output "redis_host" {
   value = google_redis_instance.crowdflow_cache.host
 }
 
 output "db_connection_name" {
   value = google_sql_database_instance.crowdflow_db.connection_name
+}
+
+output "runner_service_account" {
+  value = google_service_account.crowdflow_runner.email
 }
