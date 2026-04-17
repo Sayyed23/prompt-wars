@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.github
+*.md
+LICENSE
+.gitignore
+.dockerignore
+.env.local
+.env.local.template
+.kiro
+terraform
