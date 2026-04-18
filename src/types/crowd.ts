@@ -16,8 +16,9 @@ export interface ZoneDensity {
 
 export interface DensitySnapshot {
   timestamp: string;
+  lastUpdated: string;
   totalOccupancy: number;
-  zones: ZoneDensity[];
+  zones: Record<string, ZoneDensity>;
 }
 
 export interface Trend {

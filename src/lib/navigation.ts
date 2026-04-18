@@ -12,7 +12,7 @@ export async function findOptimizedRoute(
   originZoneId: string,
   destinationZoneId: string
 ): Promise<Route> {
-  const redis = getRedisClient();
+  const redis = await getRedisClient();
   const zones = getAllZones();
   
   // Weights for density levels (Requirement 3.2)

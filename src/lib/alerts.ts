@@ -14,7 +14,7 @@ const ACTIVE_ALERTS_KEY = 'alerts:active';
  * Limit: 3 notifications per 15 minutes.
  */
 export async function checkNotificationRateLimit(userId: string): Promise<boolean> {
-  const redis = getRedisClient();
+  const redis = await getRedisClient();
   const key = `ratelimit:notifications:${userId}`;
   
   const count = await redis.incr(key);
@@ -29,7 +29,7 @@ export async function checkNotificationRateLimit(userId: string): Promise<boolea
  * Creates a new alert and stores it in Redis (Requirement 12.1).
  */
 export async function createAlert(data: Omit<Alert, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'assignedStaffIds'>): Promise<Alert> {
-  const redis = getRedisClient();
+  const redis = await getRedisClient();
   const id = uuidv4();
   const now = new Date().toISOString();
   
@@ -60,7 +60,7 @@ export async function updateAlertStatus(
   status: AlertStatus,
   staffIds?: string[]
 ): Promise<Alert | null> {
-  const redis = getRedisClient();
+  const redis = await getRedisClient();
   const key = `alert:${alertId}`;
   
   const data = await redis.get(key);
@@ -89,17 +89,17 @@ export async function updateAlertStatus(
  * Retrieves all active alerts (Requirement 6.5).
  */
 export async function getActiveAlerts(): Promise<Alert[]> {
-  const redis = getRedisClient();
+  const redis = await getRedisClient();
   const alertIds = await redis.sMembers(ACTIVE_ALERTS_KEY);
   
   if (alertIds.length === 0) return [];
   
   const alertsData = await Promise.all(
-    alertIds.map(id => redis.get(`alert:${id}`))
+    alertIds.map((id: string) => redis.get(`alert:${id}`))
   );
   
   return alertsData
     .filter((d): d is string => !!d)
-    .map(d => JSON.parse(d))
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .map((d: string) => JSON.parse(d) as Alert)
+    .sort((a: Alert, b: Alert) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }

@@ -18,7 +18,7 @@ const MOCK_ZONES: Record<string, EnhancedVenueZone> = {
     name: 'North Stand Lower',
     type: ZoneType.SEATING_BOWL,
     capacity: 5000,
-    coordinates: [],
+    coordinates: [{x: 10, y: 10}, {x: 45, y: 10}, {x: 45, y: 45}, {x: 10, y: 45}],
     adjacencies: ['zone-food-1'],
   },
   'zone-south-1': {
@@ -26,7 +26,7 @@ const MOCK_ZONES: Record<string, EnhancedVenueZone> = {
     name: 'South Stand Lower',
     type: ZoneType.SEATING_BOWL,
     capacity: 5000,
-    coordinates: [],
+    coordinates: [{x: 55, y: 10}, {x: 90, y: 10}, {x: 90, y: 45}, {x: 55, y: 45}],
     adjacencies: ['zone-food-1'],
   },
   'zone-food-1': {
@@ -34,7 +34,7 @@ const MOCK_ZONES: Record<string, EnhancedVenueZone> = {
     name: 'Main Food Concourse',
     type: ZoneType.FOOD_STALL,
     capacity: 1000,
-    coordinates: [],
+    coordinates: [{x: 10, y: 55}, {x: 90, y: 55}, {x: 90, y: 75}, {x: 10, y: 75}],
     adjacencies: ['zone-north-1', 'zone-south-1', 'zone-entry-1'],
   },
   'zone-entry-1': {
@@ -42,7 +42,7 @@ const MOCK_ZONES: Record<string, EnhancedVenueZone> = {
     name: 'Main West Entry',
     type: ZoneType.ENTRY_GATE,
     capacity: 2000,
-    coordinates: [],
+    coordinates: [{x: 10, y: 85}, {x: 90, y: 85}, {x: 90, y: 95}, {x: 10, y: 95}],
     adjacencies: ['zone-food-1'],
   },
 };

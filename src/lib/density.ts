@@ -1,17 +1,8 @@
 import { DensityLevel } from '../types/crowd';
+import { DESIGN_TOKENS } from './design-tokens';
 
 /**
  * Calculates the density level based on occupancy and capacity.
- *
- * Logic (Requirement 11.1):
- * - Low: 0-40%
- * - Moderate: 41-70%
- * - High: 71-90%
- * - Critical: 91-100% (or above)
- *
- * @param occupancy The current number of people in the zone
- * @param capacity The maximum capacity of the zone
- * @returns The density level
  */
 export function calculateDensityLevel(
   occupancy: number,
@@ -30,21 +21,18 @@ export function calculateDensityLevel(
 /**
  * Maps a density level to a CSS color variable or hex code.
  * (Requirement 1.3)
- *
- * @param level The density level
- * @returns A color representation
  */
 export function getDensityColor(level: DensityLevel): string {
   switch (level) {
     case DensityLevel.LOW:
-      return '#4caf50'; // Green
+      return DESIGN_TOKENS.density.low;
     case DensityLevel.MODERATE:
-      return '#ffeb3b'; // Yellow
+      return DESIGN_TOKENS.density.moderate;
     case DensityLevel.HIGH:
-      return '#ff9800'; // Orange
+      return DESIGN_TOKENS.density.high;
     case DensityLevel.CRITICAL:
-      return '#f44336'; // Red
+      return DESIGN_TOKENS.density.critical;
     default:
-      return '#9e9e9e'; // Grey
+      return DESIGN_TOKENS.colors.stealth[300];
   }
 }
