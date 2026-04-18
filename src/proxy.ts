@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { SECURITY_HEADERS } from '@/shared/lib/security-headers';
 
 /**
- * Next.js Middleware (Requirements 9.5, 5.2)
+ * Next.js Proxy (Requirements 9.5, 5.2)
  * Applies security headers, HTTPS enforcement, and rate limiting.
  *
  * Note: Rate limiting uses Redis which isn't available in Edge Runtime,
  * so rate limiting is applied at the API route level instead.
  * This middleware focuses on security headers and HTTPS redirect.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip middleware for static assets and internal Next.js routes

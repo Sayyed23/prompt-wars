@@ -8,10 +8,10 @@ import { AlertStatus } from '@/shared/types/alerts';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { alertId: string } }
+  { params }: { params: Promise<{ alertId: string }> }
 ) {
   try {
-    const alertId = params.alertId;
+    const { alertId } = await params;
     const body = await request.json();
     const { status, staffIds } = body;
 

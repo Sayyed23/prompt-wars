@@ -9,6 +9,7 @@ import { DensitySnapshot, ZoneDensity, DensityLevel } from '../types/crowd';
 export async function getGlobalDensitySnapshot(): Promise<DensitySnapshot> {
   const zones = getAllZones();
   let totalOccupancy = 0;
+  const now = new Date().toISOString();
 
   const zoneDensities = await Promise.all(
     zones.map(async (zone) => {
@@ -27,15 +28,16 @@ export async function getGlobalDensitySnapshot(): Promise<DensitySnapshot> {
         capacity: zone.capacity,
         densityPercentage: 0,
         level: DensityLevel.LOW,
-        timestamp: new Date().toISOString(),
+        timestamp: now,
       };
     })
   );
 
   return {
-    timestamp: new Date().toISOString(),
+    timestamp: now,
+    lastUpdated: now,
     totalOccupancy,
-    zones: zoneDensities,
+    zones: zoneDensities.reduce((acc, z) => ({ ...acc, [z.zoneId]: z }), {}),
   };
 }
 

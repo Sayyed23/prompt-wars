@@ -13,6 +13,19 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+function normalizeAlerts(payload: unknown): Alert[] {
+  if (Array.isArray(payload)) return payload as Alert[];
+  if (
+    payload &&
+    typeof payload === 'object' &&
+    'data' in payload &&
+    Array.isArray((payload as { data?: unknown }).data)
+  ) {
+    return (payload as { data: Alert[] }).data;
+  }
+  return [];
+}
+
 export default function AlertCenter() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const { data: liveAlert, status } = useEventSource<Alert>('/api/realtime/alerts');
@@ -20,7 +33,7 @@ export default function AlertCenter() {
   useEffect(() => {
     fetch('/api/alerts/active')
       .then(res => res.json())
-      .then(data => setAlerts(data))
+      .then(data => setAlerts(normalizeAlerts(data)))
       .catch(err => console.error('Failed to fetch active alerts:', err));
   }, []);
 
@@ -49,7 +62,10 @@ export default function AlertCenter() {
       });
       if (res.ok) {
         const updated = await res.json();
-        setAlerts(prev => prev.map(a => a.id === alertId ? updated : a).filter(a => a.status !== AlertStatus.RESOLVED));
+        const updatedAlert = normalizeAlerts([updated])[0];
+        if (updatedAlert) {
+          setAlerts(prev => prev.map(a => a.id === alertId ? updatedAlert : a).filter(a => a.status !== AlertStatus.RESOLVED));
+        }
       }
     } catch (err) {
       console.error('Failed to update alert:', err);

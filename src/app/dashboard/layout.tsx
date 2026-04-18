@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Map as MapIcon, 
   Calendar, 
+  Clock,
   ShieldCheck as Shield, 
   MessageSquare, 
   Compass, 
@@ -31,6 +32,7 @@ export default function AttendeeLayout({
   const navItems = [
     { id: 'home', icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
     { id: 'map', icon: MapIcon, label: 'Wayfinding', href: '/dashboard/map' },
+    { id: 'queues', icon: Clock, label: 'Queues', href: '/dashboard/queues' },
     { id: 'schedule', icon: Calendar, label: 'Schedule', href: '/dashboard/schedule' },
     { id: 'assistant', icon: MessageSquare, label: 'Assistant', href: '/assistant' },
     { id: 'safety', icon: Shield, label: 'Safety', href: '/dashboard/safety' },

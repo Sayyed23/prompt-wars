@@ -16,7 +16,7 @@ describe('IoT Data Validation (Requirement 11.1, 11.4)', () => {
       fc.property(
         fc.constantFrom(...validZoneIds), // Valid zone IDs
         fc.integer({ min: 0, max: 1000 }), // occupancy within common limits
-        fc.date(), // valid date
+        fc.date().filter(date => !Number.isNaN(date.getTime())), // valid date
         (zoneId, occupancy, date) => {
           const timestamp = date.toISOString();
           const payload = { zoneId, occupancy, timestamp };
@@ -36,7 +36,7 @@ describe('IoT Data Validation (Requirement 11.1, 11.4)', () => {
       fc.property(
         fc.constantFrom(...validZoneIds),
         fc.integer({ max: -1 }), // Negative occupancy
-        fc.date(),
+        fc.date().filter(date => !Number.isNaN(date.getTime())),
         (zoneId, occupancy, date) => {
           const payload = { zoneId, occupancy, timestamp: date.toISOString() };
           expect(() => validateIoTData(payload)).toThrow(/cannot be negative/);
@@ -67,7 +67,7 @@ describe('IoT Data Validation (Requirement 11.1, 11.4)', () => {
           !['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString'].includes(id)
         ),
         fc.integer({ min: 0 }),
-        fc.date(),
+        fc.date().filter(date => !Number.isNaN(date.getTime())),
         (zoneId, occupancy, date) => {
           const payload = { zoneId, occupancy, timestamp: date.toISOString() };
           expect(() => validateIoTData(payload)).toThrow(/not found in registry/);

@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #050505;
@@ -16,6 +18,8 @@
   --stealth-200: #1a1a1a;
   --stealth-300: #333333;
   --stealth-400: #666666;
+  --stealth-500: #8a8a8a;
+  --stealth-900: #050505;
   
   --font-sans: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -41,17 +45,18 @@
   --stealth-200: #e4e4e7;
   --stealth-300: #d4d4d8;
   --stealth-400: #a1a1aa;
+  --stealth-500: #71717a;
+  --stealth-900: #18181b;
   
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   
-  cursor: default !important;
+  cursor: default;
 }
 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  cursor: crosshair; /* Premium "Admin" feel */
 }
 
 html,
@@ -62,9 +67,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(20, 255, 216, 0.03) 0, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(255, 219, 41, 0.02) 0, transparent 50%);
+  text-rendering: optimizeLegibility;
+  background-image: linear-gradient(180deg, rgba(20, 255, 216, 0.025), transparent 30rem);
   background-attachment: fixed;
 }
 
@@ -75,10 +79,17 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.02;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 100% 40px;
+  opacity: 0.4;
   pointer-events: none;
   z-index: 100;
+}
+
+button,
+a,
+[role='button'] {
+  cursor: pointer;
 }
 
 /* Accessibility Focus States */
@@ -89,11 +100,11 @@ body::before {
 
 /* Glassmorphism Evolution */
 .glass-panel {
-  background: rgba(10, 10, 10, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.9);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
   position: relative;
   overflow: hidden;
 }
@@ -127,9 +138,9 @@ body::before {
 
 .glass-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
 }
 
 .glass-card:hover {
@@ -195,9 +206,19 @@ body::before {
   animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.reveal-scale {
+  opacity: 0;
+  animation: reveal-scale 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @keyframes reveal {
   from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
   to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes reveal-scale {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* Staggered Delay Utilities */
@@ -205,6 +226,25 @@ body::before {
 .stagger-2 { animation-delay: 0.1s; }
 .stagger-3 { animation-delay: 0.15s; }
 .stagger-4 { animation-delay: 0.2s; }
+
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--stealth-300) transparent;
+}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -246,4 +286,21 @@ body::before {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal,
+  .reveal-scale {
+    opacity: 1;
+    transform: none;
+  }
 }

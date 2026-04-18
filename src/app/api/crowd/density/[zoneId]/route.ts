@@ -8,9 +8,9 @@ import { ZoneDensity, DensityLevel } from '@/shared/types/crowd';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { zoneId: string } }
+  { params }: { params: Promise<{ zoneId: string }> }
 ) {
-  const { zoneId } = params;
+  const { zoneId } = await params;
 
   try {
     const details = await getZoneDensityDetails(zoneId);

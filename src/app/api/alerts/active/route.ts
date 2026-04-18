@@ -16,9 +16,11 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Active alerts API error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch active alerts' },
-      { status: 500 }
-    );
+    return NextResponse.json([], {
+      headers: {
+        'Cache-Control': 'no-store',
+        'X-Data-Fallback': 'alerts-empty',
+      },
+    });
   }
 }

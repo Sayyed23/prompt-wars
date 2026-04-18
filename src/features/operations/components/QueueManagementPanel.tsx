@@ -28,6 +28,26 @@ type SortConfig = {
   direction: 'ascending' | 'descending';
 } | null;
 
+const QUEUE_PROFILE_BY_FACILITY: Record<string, {
+  waitTime: number;
+  confidence: ConfidenceLevel;
+  historical: number[];
+  sampleCount: number;
+}> = {
+  'gate-1': {
+    waitTime: 6,
+    confidence: ConfidenceLevel.HIGH,
+    historical: [8, 7, 7, 6, 8, 9, 7, 6, 6, 5],
+    sampleCount: 184,
+  },
+  'food-1': {
+    waitTime: 14,
+    confidence: ConfidenceLevel.MEDIUM,
+    historical: [18, 16, 20, 17, 14, 15, 13, 16, 14, 12],
+    sampleCount: 92,
+  },
+};
+
 export default function QueueManagementPanel() {
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [exporting, setExporting] = useState(false);
@@ -35,13 +55,19 @@ export default function QueueManagementPanel() {
 
   // Mocked prediction data
   const predictions = useMemo(() => {
-    return facilities.map(f => ({
-      ...f,
-      waitTime: Math.floor(Math.random() * 25) + 5,
-      confidence: Math.random() > 0.3 ? ConfidenceLevel.HIGH : ConfidenceLevel.MEDIUM,
-      historical: Array.from({ length: 10 }, () => Math.floor(Math.random() * 30)),
-      sampleCount: Math.floor(Math.random() * 200) + 50
-    }));
+    return facilities.map((f, index) => {
+      const profile = QUEUE_PROFILE_BY_FACILITY[f.id] ?? {
+        waitTime: 10 + index * 4,
+        confidence: ConfidenceLevel.MEDIUM,
+        historical: [12, 11, 13, 10, 9, 11, 12, 10, 9, 8],
+        sampleCount: 72 + index * 12,
+      };
+
+      return {
+        ...f,
+        ...profile,
+      };
+    });
   }, [facilities]);
 
   const sortedData = useMemo(() => {

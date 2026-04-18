@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Alert, AlertStatus, AlertPriority } from '../../types/alerts';
-import { useEventSource } from '../../hooks/useEventSource';
+import { Alert, AlertStatus, AlertPriority } from '@/shared/types/alerts';
+import { useEventSource } from '@/shared/hooks/useEventSource';
 import { CheckCircle2, AlertCircle, Clock, MapPin, Navigation, UserCheck } from 'lucide-react';
 
 /**
@@ -18,9 +18,9 @@ export const StaffAlertPanel: React.FC = () => {
   const { data: alertStream } = useEventSource('/api/realtime/alerts');
 
   useEffect(() => {
-    if (alertStream) {
+    if (alertStream && typeof alertStream === 'string') {
       try {
-        const payload = JSON.parse(alertStream);
+        const payload = JSON.parse(alertStream as string);
         if (payload.type === 'alerts:snapshot') {
           setAlerts(payload.alerts);
         } else if (payload.type === 'alerts:new' || payload.type === 'alerts:update') {
@@ -40,7 +40,7 @@ export const StaffAlertPanel: React.FC = () => {
   const updateStatus = async (alertId: string, status: AlertStatus) => {
     setIsUpdating(alertId);
     try {
-      const res = await fetch(`/api/alerts/${alertId}/status`, {
+      const res = await fetch(`/api/alerts/${alertId}/status` as string, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, staffIds: [staffId] }),

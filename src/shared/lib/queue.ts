@@ -22,7 +22,7 @@ const SERVICE_RATES: Record<FacilityType, number> = {
 export async function calculateQueuePrediction(
   facility: Facility
 ): Promise<QueuePrediction> {
-  const redis = getRedisClient();
+  const redis = await getRedisClient();
   const zoneId = facility.zoneId;
   
   // Fetch current occupancy from Redis

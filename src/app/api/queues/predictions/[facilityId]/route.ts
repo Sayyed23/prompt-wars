@@ -8,10 +8,10 @@ import { calculateQueuePrediction } from '@/shared/lib/queue';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { facilityId: string } }
+  { params }: { params: Promise<{ facilityId: string }> }
 ) {
   try {
-    const facilityId = params.facilityId;
+    const { facilityId } = await params;
     const facility = getFacility(facilityId);
 
     if (!facility) {

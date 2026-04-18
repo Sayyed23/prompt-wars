@@ -56,8 +56,8 @@ export default function StaffCoordinationView() {
     return () => clearInterval(interval);
   }, []);
 
-  const getPointsAttribute = (coords: number[][]) => {
-    return coords.map(([x, y]) => `${x},${y}`).join(' ');
+  const getPointsAttribute = (coords: any[]) => {
+    return coords.map((c) => `${c.x},${c.y}`).join(' ');
   };
 
   return (

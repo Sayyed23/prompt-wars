@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAllFacilities } from '@/shared/lib/venue';
 import { calculateQueuePrediction } from '@/shared/lib/queue';
 import { FacilityType } from '@/shared/types/queue';
+import { CACHE_HEADERS } from '@/shared/lib/cache';
 
 /**
  * GET /api/queues/predictions
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(predictions, {
       headers: {
-        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        'Cache-Control': CACHE_HEADERS.predictions,
         'X-Response-Time': 'low',
       },
     });

@@ -110,6 +110,38 @@ export function sanitizePII(text: string): string {
 }
 
 /**
+ * Basic XSS Sanitization for user inputs (Requirement 9.3).
+ */
+export function sanitizeXSS(text: string): string {
+  if (!text) return text;
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
+
+/**
+ * Validates a CSRF token from the request header (Requirement 9.4).
+ */
+export function verifyCsrfToken(requestToken: string | null, sessionToken: string): boolean {
+  if (!requestToken) return false;
+  
+  // Simple CSRF check: request token must match a HMAC of the session ID
+  const session = validateSessionToken(sessionToken);
+  if (!session) return false;
+
+  const expectedToken = crypto
+    .createHmac('sha256', SESSION_SECRET)
+    .update(`csrf:${session.sessionId}`)
+    .digest('hex');
+
+  return requestToken === expectedToken;
+}
+
+/**
  * Validates an IoT API key (Requirement 10.1).
  */
 export function validateApiKey(apiKey: string | null): boolean {

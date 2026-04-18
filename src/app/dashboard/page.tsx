@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import LuminaMap from '@/components/attendee/LuminaMap';
-import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import MobileNav from '@/components/attendee/MobileNav';
 import { 
   Zap, 
   MapPin, 
@@ -15,12 +15,21 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+const LuminaMap = dynamic(() => import('@/components/attendee/LuminaMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full min-h-[400px] items-center justify-center rounded-lg border border-card-border bg-stealth-100/40 text-[10px] font-black uppercase tracking-widest text-stealth-400">
+      Loading venue map
+    </div>
+  ),
+});
+
 export default function AttendeeDashboard() {
   return (
     <div className="space-y-12 pb-24">
       {/* Welcome Hero - Editorial Grade */}
       <header className="space-y-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3" role="status" aria-live="polite">
            <div className="bg-primary p-2 rounded-lg">
               <Zap className="h-4 w-4 text-background" />
            </div>
@@ -75,7 +84,7 @@ export default function AttendeeDashboard() {
                 <TrendingUp className="h-5 w-5 text-primary" />
              </div>
 
-             <div className="bg-white rounded-[2.5rem] border border-card-border p-8 flex items-center justify-between shadow-sm hover:shadow-xl hover:shadow-black/[0.02] transition-all">
+             <Link href="/dashboard/queues" className="bg-white rounded-[2.5rem] border border-card-border p-8 flex items-center justify-between shadow-sm hover:shadow-xl hover:shadow-black/[0.02] transition-all group">
                 <div className="flex items-center gap-5">
                    <div className="bg-stealth-100 p-4 rounded-3xl">
                       <Heart className="h-6 w-6 text-stealth-400" />
@@ -85,8 +94,8 @@ export default function AttendeeDashboard() {
                       <p className="text-xl font-black tracking-tighter uppercase">High Speed</p>
                    </div>
                 </div>
-                <Zap className="h-5 w-5 text-primary" />
-             </div>
+                <Zap className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+             </Link>
           </div>
 
           {/* Assistant Quick Entry */}
@@ -98,10 +107,11 @@ export default function AttendeeDashboard() {
              <p className="text-xs font-medium leading-relaxed text-stealth-500">
                 Ask about the fastest route to the Coffee Lab or check workshop availability.
              </p>
-             <Link href="/assistant">
-                <button className="w-full py-5 bg-stealth-100 text-foreground rounded-2xl font-black uppercase tracking-widest text-[9px] hover:bg-primary transition-all duration-300">
-                   Open Assistant Chat
-                </button>
+             <Link
+               href="/assistant"
+               className="flex touch-target w-full items-center justify-center rounded-md bg-stealth-100 px-5 py-4 text-[9px] font-black uppercase tracking-widest text-foreground transition-colors hover:bg-primary"
+             >
+               Open Assistant Chat
              </Link>
           </div>
         </div>
@@ -119,15 +129,17 @@ export default function AttendeeDashboard() {
                  <LuminaMap />
               </div>
               <div className="absolute bottom-10 right-10 z-10">
-                 <Link href="/dashboard/map">
-                    <button className="px-8 py-4 bg-foreground text-white rounded-2xl font-black uppercase tracking-widest text-[9px] hover:bg-primary hover:text-foreground transition-all duration-300 shadow-2xl shadow-foreground/20">
-                       Full Screen Wayfinding
-                    </button>
+                 <Link
+                   href="/dashboard/map"
+                   className="flex touch-target items-center justify-center rounded-md bg-foreground px-8 py-4 text-[9px] font-black uppercase tracking-widest text-white shadow-2xl shadow-foreground/20 transition-colors hover:bg-primary hover:text-foreground"
+                 >
+                   Full Screen Wayfinding
                  </Link>
               </div>
            </div>
         </div>
       </div>
+      <MobileNav />
     </div>
   );
 }

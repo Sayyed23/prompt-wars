@@ -101,6 +101,7 @@ export default function CrowdHeatmap() {
           className="w-full h-full drop-shadow-[0_0_30px_rgba(0,0,0,0.5)]"
           preserveAspectRatio="xMidYMid meet"
           role="img"
+          aria-label="Live Venue Crowd Density Heatmap"
         >
           <defs>
             <filter id="hyper-glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -127,10 +128,13 @@ export default function CrowdHeatmap() {
             return (
               <g
                 key={zone.id}
-                className="cursor-pointer outline-none transition-all duration-500"
+                className="cursor-pointer outline-none transition-all duration-500 hover:brightness-125 focus:brightness-150"
                 onClick={() => setSelectedZone(zone.id === selectedZone ? null : zone.id)}
+                onKeyDown={(e) => e.key === 'Enter' && setSelectedZone(zone.id === selectedZone ? null : zone.id)}
                 tabIndex={0}
                 role="button"
+                aria-pressed={selectedZone === zone.id}
+                aria-label={`${zone.name} density: ${density?.level || 'Unknown'}`}
               >
                 {/* Heat Base */}
                 <motion.polygon

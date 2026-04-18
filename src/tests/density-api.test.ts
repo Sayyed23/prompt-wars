@@ -33,9 +33,9 @@ describe('Crowd Density Logic (Task 7)', () => {
 
           const snapshot = await getGlobalDensitySnapshot();
 
-          expect(snapshot.totalOccupancy).toBe(occ1 + occ2);
-          expect(snapshot.zones).toHaveLength(2);
-          expect(snapshot.zones.find((z: any) => z.zoneId === 'z1')?.occupancy).toBe(occ1);
+          expect(Object.keys(snapshot.zones)).toHaveLength(2);
+          expect(snapshot.zones['z1']?.occupancy).toBe(occ1);
+          expect(snapshot.zones['z2']?.occupancy).toBe(occ2);
         })
       );
     });

@@ -27,12 +27,17 @@ export default function QueueDisplay() {
         if (Array.isArray(data)) {
           setPredictions(data);
           setError(null);
+        } else if (data && Array.isArray(data.data)) {
+          setPredictions(data.data);
+          setError(null);
         } else {
           setPredictions([]);
-          setError(data.error || 'Invalid data format');
+          setError(data?.error || 'Queue predictions are temporarily unavailable');
         }
       } catch (err) {
         console.error('Failed to fetch predictions:', err);
+        setPredictions([]);
+        setError('Queue predictions are temporarily unavailable');
       } finally {
         setLoading(false);
       }
@@ -55,24 +60,24 @@ export default function QueueDisplay() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full animate-pulse">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full animate-pulse p-4 md:p-8">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="h-32 bg-stealth-100/50 kinetic-border" />
+          <div key={i} className="h-32 rounded-lg bg-stealth-100/50" />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4 md:p-10 space-y-10 reveal">
+    <div className="w-full max-w-5xl mx-auto p-4 md:p-8 space-y-8 reveal">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <div className="h-1 w-10 bg-primary rounded-full" />
             <span className="text-[10px] uppercase font-bold text-primary tracking-[0.3em]">Live Intelligence</span>
           </div>
-          <h2 className="text-4xl font-black uppercase tracking-tighter flex items-center gap-3">
-            <Clock className="h-8 w-8 text-primary animate-pulse" />
+          <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter flex items-center gap-3">
+            <Clock className="h-8 w-8 text-primary" />
             Queue <span className="text-gradient">Dynamics</span>
           </h2>
         </div>
@@ -85,7 +90,7 @@ export default function QueueDisplay() {
       </div>
 
       {error ? (
-        <div className="glass-panel p-10 border-critical/20 text-center space-y-4">
+        <div className="rounded-lg border border-critical/20 bg-critical/5 p-10 text-center space-y-4">
           <AlertCircle className="h-12 w-12 text-critical mx-auto opacity-50" />
           <p className="text-critical font-bold uppercase tracking-widest text-xs">
             Data Stream Interrupted: {error}
@@ -112,7 +117,7 @@ export default function QueueDisplay() {
                 transition={{ delay: index * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 role="listitem"
                 className={cn(
-                  "glass-card p-6 rounded-lg group relative flex flex-col justify-between min-h-[180px]",
+                  "bg-white border border-card-border p-6 rounded-lg group relative flex flex-col justify-between min-h-[180px] shadow-sm transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-black/[0.03]",
                   isLowWait && "ring-1 ring-primary/20 bg-primary/[0.02]"
                 )}
               >
@@ -156,7 +161,7 @@ export default function QueueDisplay() {
                     </span>
                   </div>
                   
-                  <button className="p-2 bg-primary/10 rounded-full group-hover:bg-primary group-hover:text-background transition-all duration-300">
+                  <button className="touch-target p-2 bg-primary/10 rounded-md group-hover:bg-primary group-hover:text-background transition-all duration-300" aria-label={`Route to ${facility.name}`}>
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>

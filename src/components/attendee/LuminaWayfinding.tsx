@@ -49,13 +49,19 @@ export default function LuminaWayfinding() {
 
         <div className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[9px] font-black uppercase tracking-widest text-stealth-400 px-4">Current Entry Point</label>
+            <label 
+              htmlFor="origin-select"
+              className="text-[11px] font-black uppercase tracking-widest text-stealth-400 px-4"
+            >
+              Select start location
+            </label>
             <div className="relative group">
               <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-primary transition-transform group-hover:scale-110" />
               <select
+                id="origin-select"
                 value={origin}
                 onChange={(e) => setOrigin(e.target.value)}
-                className="w-full bg-stealth-100/50 border border-card-border rounded-2xl py-5 pl-14 pr-6 text-[11px] font-bold uppercase tracking-tight focus:bg-white focus:border-primary focus:shadow-xl focus:shadow-primary/10 outline-none appearance-none transition-all cursor-pointer"
+                className="w-full bg-stealth-100/50 border border-card-border rounded-2xl py-5 pl-14 pr-6 text-xs font-bold uppercase tracking-tight focus:bg-white focus:border-primary focus:shadow-xl focus:shadow-primary/10 outline-none appearance-none transition-all cursor-pointer"
               >
                 <option value="">Select Origin</option>
                 {zones.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
@@ -64,13 +70,19 @@ export default function LuminaWayfinding() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[9px] font-black uppercase tracking-widest text-stealth-400 px-4">Target Destination</label>
+            <label 
+              htmlFor="destination-select"
+              className="text-[11px] font-black uppercase tracking-widest text-stealth-400 px-4"
+            >
+              Select destination
+            </label>
             <div className="relative group">
               <MapPin className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary transition-transform group-hover:scale-110" />
               <select
+                id="destination-select"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                className="w-full bg-stealth-100/50 border border-card-border rounded-2xl py-5 pl-14 pr-6 text-[11px] font-bold uppercase tracking-tight focus:bg-white focus:border-secondary focus:shadow-xl focus:shadow-secondary/10 outline-none appearance-none transition-all cursor-pointer"
+                className="w-full bg-stealth-100/50 border border-card-border rounded-2xl py-5 pl-14 pr-6 text-xs font-bold uppercase tracking-tight focus:bg-white focus:border-secondary focus:shadow-xl focus:shadow-secondary/10 outline-none appearance-none transition-all cursor-pointer"
               >
                 <option value="">Select Destination</option>
                 {zones.map(z => <option key={z.id} value={z.id}>{z.name}</option>)}
@@ -81,7 +93,8 @@ export default function LuminaWayfinding() {
           <button
             onClick={handleFindRoute}
             disabled={loading || !origin || !destination}
-            className="w-full py-6 bg-foreground text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-primary hover:text-foreground transition-all duration-500 disabled:opacity-20 flex justify-center items-center gap-3 shadow-2xl shadow-foreground/20"
+            aria-label="Compute Optimal Path"
+            className="w-full py-6 bg-foreground text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs hover:bg-primary hover:text-foreground transition-all duration-500 disabled:opacity-20 flex justify-center items-center gap-3 shadow-2xl shadow-foreground/20"
           >
             {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : (
               <>

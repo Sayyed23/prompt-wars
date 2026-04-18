@@ -64,7 +64,7 @@ describe('Property 22: Alert Notification Content Completeness', () => {
  */
 describe('Property 23: Alert Status Update Capability', () => {
   it('all status transitions are reachable from UNASSIGNED', () => {
-    const transitions: Record<string, string[]> = {
+    const transitions: Record<AlertStatus, AlertStatus[]> = {
       [AlertStatus.UNASSIGNED]: [AlertStatus.ASSIGNED, AlertStatus.ACKNOWLEDGED],
       [AlertStatus.ASSIGNED]: [AlertStatus.ACKNOWLEDGED, AlertStatus.IN_PROGRESS],
       [AlertStatus.ACKNOWLEDGED]: [AlertStatus.IN_PROGRESS, AlertStatus.RESOLVED],

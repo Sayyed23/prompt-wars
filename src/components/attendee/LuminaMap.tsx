@@ -22,6 +22,13 @@ const LUMINA_DENSITY_COLORS = {
   [DensityLevel.CRITICAL]: '#fda4af' // Rose 300
 };
 
+const WAIT_TIME_BY_ZONE: Record<string, number> = {
+  'zone-north-1': 3,
+  'zone-south-1': 4,
+  'zone-food-1': 7,
+  'zone-entry-1': 5,
+};
+
 export default function LuminaMap() {
   const [snapshot, setSnapshot] = useState<DensitySnapshot | null>(null);
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
@@ -69,7 +76,10 @@ export default function LuminaMap() {
               </div>
             ))}
           </div>
-          <button className="bg-white border border-card-border p-3 rounded-xl shadow-sm hover:shadow-md transition-all text-stealth-400 hover:text-primary">
+          <button
+            className="bg-white border border-card-border p-3 rounded-xl shadow-sm hover:shadow-md transition-all text-stealth-400 hover:text-primary touch-target"
+            aria-label="Expand venue map"
+          >
             <Maximize2 className="h-4 w-4" />
           </button>
         </div>
@@ -144,7 +154,11 @@ export default function LuminaMap() {
                   </div>
                   <h3 className="text-2xl font-black tracking-tighter uppercase">{zones.find(z => z.id === selectedZone)?.name}</h3>
                 </div>
-                <button onClick={() => setSelectedZone(null)} className="p-2 hover:bg-stealth-100 rounded-full">
+                <button
+                  onClick={() => setSelectedZone(null)}
+                  className="p-2 hover:bg-stealth-100 rounded-full touch-target"
+                  aria-label="Close zone details"
+                >
                   <Maximize2 className="h-3 w-3 text-stealth-300" />
                 </button>
               </div>
@@ -157,7 +171,7 @@ export default function LuminaMap() {
                     </div>
                     <div className="bg-stealth-100/30 p-4 rounded-2xl border border-card-border">
                        <p className="text-[8px] font-black text-stealth-400 uppercase tracking-widest mb-1">Wait Time</p>
-                       <p className="text-xl font-black tracking-tighter text-primary">{Math.floor(Math.random() * 5)}m</p>
+                       <p className="text-xl font-black tracking-tighter text-primary">{WAIT_TIME_BY_ZONE[selectedZone] ?? 5}m</p>
                     </div>
                  </div>
 

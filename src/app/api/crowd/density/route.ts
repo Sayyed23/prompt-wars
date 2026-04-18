@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getGlobalDensitySnapshot } from '@/shared/lib/crowd';
 import { DensitySnapshot, ZoneDensity, DensityLevel } from '@/shared/types/crowd';
+import { CACHE_HEADERS } from '@/shared/lib/cache';
 
 /**
  * Global Crowd Density Snapshot API (Requirement 1.1, 1.2)
@@ -14,7 +15,7 @@ export async function GET() {
     // Requirement 1.2: Support 10s refresh cycle via cache headers
     return NextResponse.json(snapshot, {
       headers: {
-        'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=59',
+        'Cache-Control': CACHE_HEADERS.density,
       },
     });
 
