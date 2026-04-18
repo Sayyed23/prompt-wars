@@ -29,7 +29,7 @@ chmod +x scripts/gcp-setup.sh
 - ✓ Enables 9 required APIs
 - ✓ Creates `crowdflow-sa` service account
 - ✓ Grants 6 IAM roles
-- ✓ Creates service account key (`gcp-sa-key.json`)
+- ✓ Creates service account key (`.secrets/gcp-sa-key.json`)
 - ✓ Creates Artifact Registry repository
 - ✓ Configures Docker authentication
 
@@ -49,7 +49,7 @@ chmod +x scripts/create-secrets.sh
 
 **Prerequisites:**
 - Terraform infrastructure must be deployed (`terraform apply` completed)
-- Database password from `terraform.tfvars`
+- Database password from `infra/terraform/terraform.tfvars`
 - Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
 
 **What it does:**
@@ -72,19 +72,19 @@ chmod +x scripts/create-secrets.sh
 ./scripts/gcp-setup.sh
 
 # 2. Initialize Terraform
-cd terraform
+cd infra/terraform
 # Create terraform.tfvars with YOUR_PROJECT_ID and a SECURE_PASSWORD
 cp terraform.tfvars.example terraform.tfvars 
 # Edit terraform.tfvars
 terraform init
 terraform apply
-cd ..
+cd ../..
 
 # 3. Configure secrets
 ./scripts/create-secrets.sh
 
 # 4. Add service account key to GitHub Secrets
-cat gcp-sa-key.json
+cat .secrets/gcp-sa-key.json
 # Copy output and add to GitHub → Settings → Secrets → GCP_SA_KEY
 
 # 5. Deploy application
@@ -98,8 +98,8 @@ git push origin main
 ### Manual Setup (Alternative)
 
 If you prefer manual setup or need to troubleshoot, follow the detailed guide:
-- See: `../GCP_SETUP_GUIDE.md`
-- Checklist: `../GCP_SETUP_CHECKLIST.md`
+- See: `../docs/setup/gcp-setup.md`
+- Checklist: `../docs/setup/gcp-checklist.md`
 
 ---
 
@@ -144,7 +144,7 @@ ARTIFACT_REPO="crowdflow"            # Artifact Registry repo name
 
 ### Terraform Variables
 
-Create `terraform/terraform.tfvars`:
+Create `infra/terraform/terraform.tfvars`:
 ```hcl
 project_id  = "prompt-wars-493611"
 region      = "asia-south1"
@@ -157,7 +157,7 @@ db_password = "YOUR_SECURE_PASSWORD"
 
 ### gcp-setup.sh produces:
 
-- `gcp-sa-key.json` - Service account key for GitHub Actions
+- `.secrets/gcp-sa-key.json` - Service account key for GitHub Actions
   - **⚠️ Keep secure!** Never commit to git
   - Add to GitHub Secrets as `GCP_SA_KEY`
   - Already in `.gitignore`
@@ -242,7 +242,7 @@ cd ..
 
 **Solution:** Delete old key if you want to create new one
 ```bash
-rm gcp-sa-key.json
+rm .secrets/gcp-sa-key.json
 ./scripts/gcp-setup.sh
 ```
 
@@ -304,8 +304,8 @@ APIS=(
 
 ## Support
 
-- **Detailed Guide:** `../GCP_SETUP_GUIDE.md`
-- **Quick Checklist:** `../GCP_SETUP_CHECKLIST.md`
+- **Detailed Guide:** `../docs/setup/gcp-setup.md`
+- **Quick Checklist:** `../docs/setup/gcp-checklist.md`
 - **GCP Documentation:** https://cloud.google.com/docs
 - **Terraform Docs:** https://registry.terraform.io/providers/hashicorp/google/latest/docs
 

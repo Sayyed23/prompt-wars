@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fc from 'fast-check';
-import { getGlobalDensitySnapshot, getZoneDensityDetails } from '../lib/crowd';
-import { getAllZones, getZone } from '../lib/venue';
-import { getCache } from '../lib/redis';
-import { getHistoricalTrends } from '../lib/db';
+import { getGlobalDensitySnapshot, getZoneDensityDetails } from '@/shared/lib/crowd';
+import { getAllZones, getZone } from '@/shared/lib/venue';
+import { getCache } from '@/shared/lib/redis';
+import { getHistoricalTrends } from '@/shared/lib/db';
 
 // Mock dependencies
-vi.mock('../lib/venue');
-vi.mock('../lib/redis');
-vi.mock('../lib/db');
+vi.mock('@/shared/lib/venue');
+vi.mock('@/shared/lib/redis');
+vi.mock('@/shared/lib/db');
 
 describe('Crowd Density Logic (Task 7)', () => {
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('Crowd Density Logic (Task 7)', () => {
 
           expect(snapshot.totalOccupancy).toBe(occ1 + occ2);
           expect(snapshot.zones).toHaveLength(2);
-          expect(snapshot.zones.find(z => z.zoneId === 'z1')?.occupancy).toBe(occ1);
+          expect(snapshot.zones.find((z: any) => z.zoneId === 'z1')?.occupancy).toBe(occ1);
         })
       );
     });
@@ -61,9 +61,9 @@ describe('Crowd Density Logic (Task 7)', () => {
 
     it('should return null for non-existent zones', async () => {
       (getZone as any).mockReturnValue(null);
-      
+
       const details = await getZoneDensityDetails('non-existent');
-      
+
       expect(details).toBeNull();
     });
   });

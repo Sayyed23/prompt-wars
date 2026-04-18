@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { AlertStatus, AlertPriority, AlertType } from '../../types/alerts';
+import { AlertStatus, AlertPriority, AlertType } from '@/shared/types/alerts';
 
 /**
  * Property 21: Alert Delivery Timing

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateChatMessage } from '../../lib/ai';
+import { validateChatMessage } from '@/shared/lib/ai';
 
 /**
  * E2E Test: Attendee uses AI assistant (Task 24.3)

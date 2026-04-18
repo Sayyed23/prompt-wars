@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGlobalDensitySnapshot } from '@/lib/crowd';
+import { getGlobalDensitySnapshot } from '@/shared/lib/crowd';
 
 /**
  * Polling Fallback for Crowd Density Updates (Requirement 14.3)

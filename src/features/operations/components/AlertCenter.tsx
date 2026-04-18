@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, AlertTriangle, Shield, Activity, CheckCircle2, UserPlus, Clock } from 'lucide-react';
-import { Alert, AlertStatus, AlertPriority, AlertType } from '@/types/alerts';
-import { useEventSource } from '@/hooks/useEventSource';
-import { DESIGN_TOKENS } from '@/lib/design-tokens';
+import { Alert, AlertStatus, AlertPriority, AlertType } from '@/shared/types/alerts';
+import { useEventSource } from '@/shared/hooks/useEventSource';
+import { DESIGN_TOKENS } from '@/shared/lib/design-tokens';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

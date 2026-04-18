@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import OperationsDashboard from '../app/operations/page';
-import AttendeeDashboard from '../app/dashboard/page';
+import OperationsDashboard from '@/app/operations/page';
+import AttendeeDashboard from '@/app/dashboard/page';
 
 // Mock high-level hooks and components
-vi.mock('../hooks/useEventSource', () => ({
+vi.mock('@/shared/hooks/useEventSource', () => ({
   useEventSource: () => ({ data: null, status: 'connected' })
 }));
 

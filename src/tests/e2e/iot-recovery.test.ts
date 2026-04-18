@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { validateIoTData } from '../../lib/iot';
-import { getZone, getAllZones } from '../../lib/venue';
+import { validateIoTData } from '@/shared/lib/iot';
+import { getZone, getAllZones } from '@/shared/lib/venue';
 
 /**
  * E2E Test: IoT data loss and recovery (Task 24.6)

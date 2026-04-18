@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { validateChatMessage } from '../../lib/ai';
+import { validateChatMessage } from '@/shared/lib/ai';
 
 /**
  * Property 13: AI Assistant Query Acceptance

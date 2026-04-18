@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllFacilities } from '@/lib/venue';
-import { calculateQueuePrediction } from '@/lib/queue';
-import { FacilityType } from '@/types/queue';
+import { getAllFacilities } from '@/shared/lib/venue';
+import { calculateQueuePrediction } from '@/shared/lib/queue';
+import { FacilityType } from '@/shared/types/queue';
 
 /**
  * GET /api/queues/predictions

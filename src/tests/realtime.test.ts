@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { RealtimeClient } from '@/lib/realtime';
+import { RealtimeClient } from '@/shared/lib/realtime';
 
 describe('RealtimeClient', () => {
   let client: RealtimeClient;
-  let mockOnMessage: ReturnType<typeof vi.fn>;
-  let mockOnStatusChange: ReturnType<typeof vi.fn>;
-  let mockOnError: ReturnType<typeof vi.fn>;
+  let mockOnMessage: any;
+  let mockOnStatusChange: any;
+  let mockOnError: any;
 
   beforeEach(() => {
     mockOnMessage = vi.fn();

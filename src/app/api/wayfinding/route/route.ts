@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findOptimizedRoute } from '@/lib/navigation';
+import { findOptimizedRoute } from '@/shared/lib/navigation';
 
 /**
  * POST /api/wayfinding/route

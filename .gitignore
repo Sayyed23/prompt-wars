@@ -41,6 +41,7 @@ next-env.d.ts
 .terraform.lock.hcl
 
 # Secrets and Credentials
+.secrets/
 .env
 .env.local
 .env.*.local

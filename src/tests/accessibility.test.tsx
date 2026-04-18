@@ -4,15 +4,15 @@ import CrowdHeatmap from '@/components/attendee/CrowdHeatmap';
 import QueueDisplay from '@/components/attendee/QueueDisplay';
 import AIAssistantChat from '@/components/attendee/AIAssistantChat';
 import WayfindingPane from '@/components/attendee/WayfindingPane';
-import AlertCenter from '@/components/operations/AlertCenter';
+import AlertCenter from '@/features/operations/components/AlertCenter';
 
 // Mocking useEventSource
-vi.mock('@/hooks/useEventSource', () => ({
+vi.mock('@/shared/hooks/useEventSource', () => ({
   useEventSource: () => ({ data: null, status: 'connected' })
 }));
 
 // Mocking lib/venue
-vi.mock('@/lib/venue', () => ({
+vi.mock('@/shared/lib/venue', () => ({
   getAllZones: () => [
     { id: 'z1', name: 'Zone 1', coordinates: [[0,0], [10,0], [10,10], [0,10]], capacity: 100 }
   ],

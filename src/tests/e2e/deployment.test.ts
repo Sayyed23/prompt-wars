@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { SECURITY_HEADERS } from '../../lib/security';
-import { RATE_LIMIT_TIERS } from '../../lib/rate-limiter';
-import { CACHE_TTL, POOL_CONFIG } from '../../lib/cache';
+import { SECURITY_HEADERS } from '@/shared/lib/security';
+import { RATE_LIMIT_TIERS } from '@/shared/lib/rate-limiter';
+import { CACHE_TTL, POOL_CONFIG } from '@/shared/lib/cache';
 
 /**
  * E2E Test: Cloud Run deployment and scaling (Task 24.7)

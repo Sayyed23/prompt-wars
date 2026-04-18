@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import AlertCenter from '@/components/operations/AlertCenter';
-import AlertCreationForm from '@/components/operations/AlertCreationForm';
-import { StaffAlertPanel } from '@/components/operations/StaffAlertPanel';
+import AlertCenter from '@/features/operations/components/AlertCenter';
+import AlertCreationForm from '@/features/operations/components/AlertCreationForm';
+import { StaffAlertPanel } from '@/features/operations/components/StaffAlertPanel';
 import { 
   Shield, 
   ChevronLeft, 

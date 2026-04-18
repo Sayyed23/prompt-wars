@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getAllZones, getZone } from '../../lib/venue';
+import { getAllZones, getZone } from '@/shared/lib/venue';
 
 /**
  * E2E Test: Attendee requests navigation (Task 24.2)

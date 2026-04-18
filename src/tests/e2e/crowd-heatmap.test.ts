@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { calculateDensityLevel, getDensityColor } from '../../lib/density';
-import { DensityLevel } from '../../types/crowd';
-import { getAllZones, getAllFacilities } from '../../lib/venue';
-import { FacilityType } from '../../types/queue';
+import { calculateDensityLevel, getDensityColor } from '@/shared/lib/density';
+import { DensityLevel } from '@/shared/types/crowd';
+import { getAllZones, getAllFacilities } from '@/shared/lib/venue';
+import { FacilityType } from '@/shared/types/queue';
 
 /**
  * E2E Test: Attendee views crowd heatmap and queue times (Task 24.1)

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateAlertStatus } from '@/lib/alerts';
-import { AlertStatus } from '@/types/alerts';
+import { updateAlertStatus } from '@/shared/lib/alerts';
+import { AlertStatus } from '@/shared/types/alerts';
 
 /**
  * PATCH /api/alerts/[alertId]/status

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRedisClient } from '../../../../lib/redis';
-import { findOptimizedRoute } from '../../../../lib/navigation';
-import { getZone } from '../../../../lib/venue';
-import { DensityLevel } from '../../../../types/crowd';
+import { getRedisClient } from '@/shared/lib/redis';
+import { findOptimizedRoute } from '@/shared/lib/navigation';
+import { getZone } from '@/shared/lib/venue';
+import { DensityLevel } from '@/shared/types/crowd';
 
 /**
  * POST /api/wayfinding/recalculate

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { calculateQueuePrediction } from '../lib/queue';
-import { ConfidenceLevel, Facility, FacilityType } from '../types/queue';
+import { calculateQueuePrediction } from '@/shared/lib/queue';
+import { ConfidenceLevel, Facility, FacilityType } from '@/shared/types/queue';
 
 // Mock dependencies
-vi.mock('../lib/redis', () => ({
+vi.mock('@/shared/lib/redis', () => ({
   getRedisClient: () => ({
     get: vi.fn().mockResolvedValue('50'),
   }),
@@ -36,8 +36,8 @@ describe('Queue Prediction Logic (Requirement 8.1, 2.4)', () => {
   });
 
   it('Property 5: Should map confidence levels based on sample count', async () => {
-    const { getHistoricalTrends } = await import('../lib/db');
-    
+    const { getHistoricalTrends } = await import('@/shared/lib/db');
+
     // Test HIGH confidence (>100 samples)
     vi.mocked(getHistoricalTrends).mockResolvedValue(new Array(150).fill({}));
     let prediction = await calculateQueuePrediction(mockFacility);

@@ -6,12 +6,12 @@ import {
   detectPII,
   sanitizePII,
   SECURITY_HEADERS,
-} from '../lib/security';
+} from '@/shared/lib/security';
 import {
   RATE_LIMIT_TIERS,
   classifyEndpoint,
   rateLimitHeaders,
-} from '../lib/rate-limiter';
+} from '@/shared/lib/rate-limiter';
 
 /**
  * Security Property Tests (Requirements 9.1, 9.2, 9.5)

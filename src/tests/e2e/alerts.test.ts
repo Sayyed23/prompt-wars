@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { AlertStatus, AlertPriority, AlertType } from '../../types/alerts';
+import { AlertStatus, AlertPriority, AlertType } from '@/shared/types/alerts';
 
 /**
  * E2E Test: Alert lifecycle (Tasks 24.4, 24.5)

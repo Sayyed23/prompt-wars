@@ -14,8 +14,8 @@ import {
   AlertCircle,
   Clock
 } from 'lucide-react';
-import { getAllFacilities, getZone } from '@/lib/venue';
-import { ConfidenceLevel, Facility, FacilityType } from '@/types/queue';
+import { getAllFacilities, getZone } from '@/shared/lib/venue';
+import { ConfidenceLevel, Facility, FacilityType } from '@/shared/types/queue';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

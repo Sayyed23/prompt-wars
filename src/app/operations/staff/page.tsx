@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import StaffCoordinationView from '@/components/operations/StaffCoordinationView';
+import StaffCoordinationView from '@/features/operations/components/StaffCoordinationView';
 import { 
   Users, 
   ChevronLeft, 

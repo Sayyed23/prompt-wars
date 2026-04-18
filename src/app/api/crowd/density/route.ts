@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getGlobalDensitySnapshot } from '@/lib/crowd';
-import { DensitySnapshot, ZoneDensity, DensityLevel } from '@/types/crowd';
+import { getGlobalDensitySnapshot } from '@/shared/lib/crowd';
+import { DensitySnapshot, ZoneDensity, DensityLevel } from '@/shared/types/crowd';
 
 /**
  * Global Crowd Density Snapshot API (Requirement 1.1, 1.2)

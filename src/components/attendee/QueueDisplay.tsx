@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Users, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
-import { QueuePrediction, ConfidenceLevel, FacilityType } from '@/types/queue';
-import { getAllFacilities } from '@/lib/venue';
-import { DESIGN_TOKENS } from '@/lib/design-tokens';
+import { QueuePrediction, ConfidenceLevel, FacilityType } from '@/shared/types/queue';
+import { getAllFacilities } from '@/shared/lib/venue';
+import { DESIGN_TOKENS } from '@/shared/lib/design-tokens';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

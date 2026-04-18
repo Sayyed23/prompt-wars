@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { validateIoTData } from '../../lib/iot';
-import { getAllZones, getZone } from '../../lib/venue';
+import { validateIoTData } from '@/shared/lib/iot';
+import { getAllZones, getZone } from '@/shared/lib/venue';
 
-const validZoneIds = getAllZones().map(z => z.id);
+const validZoneIds = getAllZones().map((z: any) => z.id);
 
 /**
  * Property 39: IoT Data Processing Timing

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { RealtimeClient, ConnectionStatus } from '@/lib/realtime';
+import { RealtimeClient, ConnectionStatus } from '@/shared/lib/realtime';
 
 /**
  * React hook for real-time data subscriptions

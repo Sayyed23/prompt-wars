@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { validateIoTData } from '../lib/iot';
-import { getAllZones } from '../lib/venue';
+import { validateIoTData } from '@/shared/lib/iot';
+import { getAllZones } from '@/shared/lib/venue';
 
 /**
  * Property Tests for Task 6: IoT Data Ingestion and Validation
@@ -96,13 +96,13 @@ describe('IoT Data Validation (Requirement 11.1, 11.4)', () => {
 
   it('Property 40: IoT Data Update Throughput (Requirement 11.3)', () => {
     // Property: Should handle valid data for multiple zones without conflict
-    const batch = validZoneIds.map(id => ({
+    const batch = validZoneIds.map((id: string) => ({
       zoneId: id,
       occupancy: 50,
       timestamp: new Date().toISOString()
     }));
 
-    const results = batch.map(p => validateIoTData(p));
+    const results = batch.map((p: any) => validateIoTData(p));
     expect(results).toHaveLength(validZoneIds.length);
   });
 });

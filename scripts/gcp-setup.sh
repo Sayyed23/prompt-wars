@@ -135,19 +135,19 @@ print_status "IAM roles granted"
 print_info "Checking for service account key..."
 print_warning "Consider using Workload Identity Federation instead of JSON keys for production."
 
-if [ -f "gcp-sa-key.json" ]; then
-    print_warning "Service account key already exists: gcp-sa-key.json"
+if [ -f ".secrets/gcp-sa-key.json" ]; then
+    print_warning "Service account key already exists: .secrets/gcp-sa-key.json"
 else
     # Create key with restricted permissions
-    gcloud iam service-accounts keys create gcp-sa-key.json \
+    gcloud iam service-accounts keys create .secrets/gcp-sa-key.json \
         --iam-account=${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
-    chmod 600 gcp-sa-key.json
-    print_status "Service account key created: gcp-sa-key.json"
+    chmod 600 .secrets/gcp-sa-key.json
+    print_status "Service account key created: .secrets/gcp-sa-key.json"
     
-    # Check if .gitignore exists and contains the key
-    if [ -f ".gitignore" ] && ! grep -q "gcp-sa-key.json" ".gitignore"; then
-        echo "gcp-sa-key.json" >> .gitignore
-        print_status "Added gcp-sa-key.json to .gitignore"
+    # Check if .gitignore exists and contains the secrets folder
+    if [ -f ".gitignore" ] && ! grep -q ".secrets/" ".gitignore"; then
+        echo ".secrets/" >> .gitignore
+        print_status "Added .secrets/ to .gitignore"
     fi
 fi
 
@@ -175,12 +175,12 @@ echo -e "${GREEN}  Setup Complete!${NC}"
 echo -e "${GREEN}========================================${NC}\n"
 
 print_info "Next steps:"
-echo "  1. Review and update terraform/terraform.tfvars with your configuration"
-echo "  2. Run: cd terraform && terraform init && terraform apply"
+echo "  1. Review and update infra/terraform/terraform.tfvars with your configuration"
+echo "  2. Run: cd infra/terraform && terraform init && terraform apply"
 echo "  3. Create secrets (REDIS_URL, DATABASE_URL, GEMINI_API_KEY)"
-echo "  4. Add gcp-sa-key.json contents to GitHub Secrets as GCP_SA_KEY"
+echo "  4. Add .secrets/gcp-sa-key.json contents to GitHub Secrets as GCP_SA_KEY"
 echo ""
-print_info "For detailed instructions, see: GCP_SETUP_GUIDE.md"
+print_info "For detailed instructions, see: docs/setup/gcp-setup.md"
 echo ""
 
 # Display important information
@@ -189,11 +189,11 @@ echo "  Project ID: $PROJECT_ID"
 echo "  Region: $REGION"
 echo "  Service Account: ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 echo "  Artifact Registry: ${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REPO}"
-echo "  Service Account Key: gcp-sa-key.json (keep secure!)"
+echo "  Service Account Key: .secrets/gcp-sa-key.json (keep secure!)"
 echo ""
 
 print_warning "Remember to:"
-echo "  - Keep gcp-sa-key.json secure and never commit it to git"
-echo "  - Add gcp-sa-key.json to .gitignore"
+echo "  - Keep .secrets/gcp-sa-key.json secure and never commit it to git"
+echo "  - Ensure .secrets/ is in .gitignore"
 echo "  - Set up GitHub Secrets before pushing to main branch"
 echo ""

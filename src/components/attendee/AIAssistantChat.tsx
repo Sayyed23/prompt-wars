@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, Send, User, Trash2, Cpu, Sparkles, AlertCircle } from 'lucide-react';
-import { DESIGN_TOKENS } from '@/lib/design-tokens';
+import { DESIGN_TOKENS } from '@/shared/lib/design-tokens';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

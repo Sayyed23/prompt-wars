@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CACHE_TTL, POOL_CONFIG, CACHE_HEADERS } from '../lib/cache';
+import { CACHE_TTL, POOL_CONFIG, CACHE_HEADERS } from '@/shared/lib/cache';
 
 /**
  * Performance Property Tests (Requirements 5.1, 5.2, 5.3, 13.4)

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SECURITY_HEADERS } from '@/lib/security-headers';
+import { SECURITY_HEADERS } from '@/shared/lib/security-headers';
 
 /**
  * Next.js Middleware (Requirements 9.5, 5.2)

@@ -47,26 +47,26 @@ print_info "Project: $PROJECT_ID"
 echo ""
 
 # Check if terraform outputs are available
-if [ ! -d "terraform" ]; then
+if [ ! -d "infra/terraform" ]; then
     print_error "Terraform directory not found. Please run from project root."
     exit 1
 fi
 
 # Check if Terraform was run (via output availability)
 print_info "Verifying Terraform deployment state..."
-if ! (cd terraform && terraform output -json >/dev/null 2>&1); then
+if ! (cd infra/terraform && terraform output -json >/dev/null 2>&1); then
     print_error "Terraform state not found or output not available."
-    echo "Please run 'cd terraform && terraform apply' first."
+    echo "Please run 'cd infra/terraform && terraform apply' first."
     exit 1
 fi
 print_status "Terraform output verified"
 
 # Get Terraform outputs
 print_info "Reading Terraform outputs..."
-cd terraform
+cd infra/terraform
 REDIS_HOST=$(terraform output -raw redis_host 2>/dev/null || echo "")
 DB_CONNECTION_NAME=$(terraform output -raw db_connection_name 2>/dev/null || echo "")
-cd ..
+cd ../..
 
 if [ -z "$REDIS_HOST" ] || [ -z "$DB_CONNECTION_NAME" ]; then
     print_error "Could not read Terraform outputs. Ensure infrastructure is deployed."

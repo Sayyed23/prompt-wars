@@ -17,7 +17,7 @@ export async function GET() {
 
   // Check Redis connectivity
   try {
-    const { getRedisClient } = await import('@/lib/redis');
+    const { getRedisClient } = await import('@/shared/lib/redis');
     const redis = await getRedisClient();
     const pingStart = Date.now();
     await redis.ping();
@@ -35,7 +35,7 @@ export async function GET() {
 
   // Check Database connectivity
   try {
-    const { getPool } = await import('@/lib/db');
+    const { getPool } = await import('@/shared/lib/db');
     const pool = getPool();
     const dbStart = Date.now();
     await pool.query('SELECT 1');

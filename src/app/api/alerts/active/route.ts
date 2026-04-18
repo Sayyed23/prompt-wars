@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getActiveAlerts } from '@/lib/alerts';
+import { getActiveAlerts } from '@/shared/lib/alerts';
 
 /**
  * GET /api/alerts/active

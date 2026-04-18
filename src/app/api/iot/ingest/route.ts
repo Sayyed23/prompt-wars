@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateIoTData } from '@/lib/iot';
-import { calculateDensityLevel } from '@/lib/density';
-import { getZone } from '@/lib/venue';
-import { setCache, getRedisClient } from '@/lib/redis';
-import { appendDensityData } from '@/lib/db';
-import { ZoneDensity } from '@/types/crowd';
+import { validateIoTData } from '@/shared/lib/iot';
+import { calculateDensityLevel } from '@/shared/lib/density';
+import { getZone } from '@/shared/lib/venue';
+import { setCache, getRedisClient } from '@/shared/lib/redis';
+import { appendDensityData } from '@/shared/lib/db';
+import { ZoneDensity } from '@/shared/types/crowd';
 
 /**
  * IoT Data Ingestion Endpoint (Requirement 11.2, 11.3, 11.4)

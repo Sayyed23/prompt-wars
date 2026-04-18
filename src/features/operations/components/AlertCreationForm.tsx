@@ -12,9 +12,9 @@ import {
   X,
   Loader2
 } from 'lucide-react';
-import { getAllZones } from '@/lib/venue';
-import { AlertPriority } from '@/types/alerts';
-import { DESIGN_TOKENS } from '@/lib/design-tokens';
+import { getAllZones } from '@/shared/lib/venue';
+import { AlertPriority } from '@/shared/types/alerts';
+import { DESIGN_TOKENS } from '@/shared/lib/design-tokens';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

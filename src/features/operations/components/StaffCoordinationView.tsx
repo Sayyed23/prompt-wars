@@ -12,8 +12,8 @@ import {
   MoreVertical,
   Activity
 } from 'lucide-react';
-import { getAllZones } from '@/lib/venue';
-import { DESIGN_TOKENS } from '@/lib/design-tokens';
+import { getAllZones } from '@/shared/lib/venue';
+import { DESIGN_TOKENS } from '@/shared/lib/design-tokens';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

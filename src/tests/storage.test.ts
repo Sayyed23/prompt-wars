@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fc from 'fast-check';
-import { getSessionData, setSessionData } from '../lib/session';
+import { getSessionData, setSessionData } from '@/shared/lib/session';
 
 /**
  * Property Tests for Task 5: Data Storage and Caching

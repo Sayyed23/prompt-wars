@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Compass, RefreshCw, AlertCircle, Info, Maximize2, Zap } from 'lucide-react';
-import { useEventSource } from '@/hooks/useEventSource';
-import { getAllZones } from '@/lib/venue';
-import { DensitySnapshot, ZoneDensity, DensityLevel } from '@/types/crowd';
-import { Coordinates } from '@/types/venue';
+import { useEventSource } from '@/shared/hooks/useEventSource';
+import { getAllZones } from '@/shared/lib/venue';
+import { DensitySnapshot, ZoneDensity, DensityLevel } from '@/shared/types/crowd';
+import { Coordinates } from '@/shared/types/venue';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

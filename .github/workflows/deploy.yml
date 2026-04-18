@@ -61,7 +61,7 @@ jobs:
 
       - name: Build and Push container
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} -t ${{ env.DOCKER_IMAGE }}:latest .
+          docker build -f infra/docker/Dockerfile -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} -t ${{ env.DOCKER_IMAGE }}:latest .
           docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           docker push ${{ env.DOCKER_IMAGE }}:latest
 
@@ -88,7 +88,7 @@ jobs:
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
-          metadata: cloudrun.yaml
+          metadata: infra/cloudrun/cloudrun.yaml
 
       - name: Show Output
         run: echo "Deployed to ${{ steps.deploy.outputs.url }}"

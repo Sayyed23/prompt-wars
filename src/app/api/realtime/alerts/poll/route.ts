@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getActiveAlerts } from '@/lib/alerts';
+import { getActiveAlerts } from '@/shared/lib/alerts';
 
 /**
  * Polling Fallback for Alert Updates (Requirement 14.3)

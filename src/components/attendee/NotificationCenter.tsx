@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { NotificationPreferences } from '../../types/alerts';
-import { useEventSource } from '../../hooks/useEventSource';
+import { NotificationPreferences } from '@/shared/types/alerts';
+import { useEventSource } from '@/shared/hooks/useEventSource';
 import { Shield, Bell, Settings, History, AlertTriangle } from 'lucide-react';
 
 interface NotificationHistoryItem {
@@ -145,7 +145,7 @@ export const NotificationCenter: React.FC = () => {
                 <Bell className="w-4 h-4 text-[#00F5FF]" />
                 <h3 className="text-white font-bold text-sm">ALERT SUBSCRIPTIONS</h3>
               </div>
-              
+
               <div className="space-y-4">
                 {[
                   { key: 'congestions', label: 'CROWD DENSITY SPIKES', desc: 'Notify when zone capacity > 80%' },

@@ -1,6 +1,6 @@
 'use client';
 
-import { ConnectionStatus as Status } from '@/lib/realtime';
+import { ConnectionStatus as Status } from '@/shared/lib/realtime';
 
 interface ConnectionStatusProps {
   status: Status;

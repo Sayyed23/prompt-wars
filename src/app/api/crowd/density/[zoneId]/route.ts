@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getZoneDensityDetails } from '@/lib/crowd';
-import { ZoneDensity, DensityLevel } from '@/types/crowd';
+import { getZoneDensityDetails } from '@/shared/lib/crowd';
+import { ZoneDensity, DensityLevel } from '@/shared/types/crowd';
 
 /**
  * Zone-Specific Density API (Requirement 1.2, 11.5)

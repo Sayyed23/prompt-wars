@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navigation2, MapPin, ChevronRight, Timer, AlertTriangle, Search, Info } from 'lucide-react';
-import { Route, Waypoint } from '@/types/navigation';
-import { getAllZones } from '@/lib/venue';
-import { DESIGN_TOKENS } from '@/lib/design-tokens';
+import { Route, Waypoint } from '@/shared/types/navigation';
+import { getAllZones } from '@/shared/lib/venue';
+import { DESIGN_TOKENS } from '@/shared/lib/design-tokens';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -125,7 +125,7 @@ export default function WayfindingPane() {
                 role="list"
                 aria-label="Navigation steps"
               >
-                {route.waypoints.map((wp, i) => (
+                {route.waypoints.map((wp: Waypoint, i: number) => (
                   <div key={i} className="relative" role="listitem">
                     <div className="absolute -left-[19px] top-1.5 w-4 h-4 rounded-full bg-background border-2 border-primary flex items-center justify-center" aria-hidden="true">
                       <div className="w-1.5 h-1.5 bg-primary rounded-full" />

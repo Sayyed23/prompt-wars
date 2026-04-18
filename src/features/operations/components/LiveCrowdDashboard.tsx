@@ -12,12 +12,12 @@ import {
   Clock,
   ArrowRight
 } from 'lucide-react';
-import { useEventSource } from '@/hooks/useEventSource';
-import { getAllZones } from '@/lib/venue';
-import { getDensityColor } from '@/lib/density';
-import { DensitySnapshot, ZoneDensity, DensityLevel } from '@/types/crowd';
-import { Coordinates } from '@/types/venue';
-import { DESIGN_TOKENS } from '@/lib/design-tokens';
+import { useEventSource } from '@/shared/hooks/useEventSource';
+import { getAllZones } from '@/shared/lib/venue';
+import { getDensityColor } from '@/shared/lib/density';
+import { DensitySnapshot, ZoneDensity, DensityLevel } from '@/shared/types/crowd';
+import { Coordinates } from '@/shared/types/venue';
+import { DESIGN_TOKENS } from '@/shared/lib/design-tokens';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

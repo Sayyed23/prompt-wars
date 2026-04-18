@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getChatStream, validateChatMessage } from '@/lib/ai';
+import { getChatStream, validateChatMessage } from '@/shared/lib/ai';
 
 export const runtime = 'edge'; // Edge runtime for better streaming support
 

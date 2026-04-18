@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import fc from 'fast-check';
-import { getRedisClient } from '@/lib/redis';
-import { DensityLevel } from '@/types/crowd';
+import { getRedisClient } from '@/shared/lib/redis';
+import { DensityLevel } from '@/shared/types/crowd';
 
 /**
  * Property-Based Tests for Real-Time Communication Layer
@@ -108,7 +108,7 @@ describe('Property Tests: Real-Time Updates', () => {
           occupancy: fc.integer({ min: 0 }),
           level: fc.constantFrom('low', 'moderate', 'high', 'critical'),
         }),
-        (data) => {
+        (data: any) => {
           // Property: SSE message format should always be valid
           const sseMessage = `data: ${JSON.stringify(data)}\n\n`;
           
@@ -141,7 +141,7 @@ describe('Property Tests: Real-Time Updates', () => {
             fc.record({
               zoneId: fc.string(),
               occupancy: fc.integer({ min: 0 }),
-            }).map(data => `data: ${JSON.stringify(data)}\n\n`)
+            }).map((data: any) => `data: ${JSON.stringify(data)}\n\n`)
           ),
           { minLength: 1, maxLength: 20 }
         ),

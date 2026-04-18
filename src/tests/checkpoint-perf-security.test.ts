@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { SECURITY_HEADERS } from '../lib/security-headers';
-import { RATE_LIMIT_TIERS } from '../lib/rate-limiter';
-import { CACHE_TTL, CACHE_HEADERS, POOL_CONFIG } from '../lib/cache';
+import { SECURITY_HEADERS } from '@/shared/lib/security-headers';
+import { RATE_LIMIT_TIERS } from '@/shared/lib/rate-limiter';
+import { CACHE_TTL, CACHE_HEADERS, POOL_CONFIG } from '@/shared/lib/cache';
 
 /**
  * Checkpoint 22: Performance & Security Verification

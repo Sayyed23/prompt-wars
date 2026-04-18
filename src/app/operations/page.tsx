@@ -19,14 +19,14 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import AlertCenter from '@/components/operations/AlertCenter';
-import { StaffAlertPanel } from '@/components/operations/StaffAlertPanel';
-import { useEventSource } from '@/hooks/useEventSource';
-import { DensitySnapshot, ZoneDensity } from '@/types/crowd';
-import { getDensityColor } from '@/lib/density';
+import AlertCenter from '@/features/operations/components/AlertCenter';
+import { StaffAlertPanel } from '@/features/operations/components/StaffAlertPanel';
+import { useEventSource } from '@/shared/hooks/useEventSource';
+import { DensitySnapshot, ZoneDensity } from '@/shared/types/crowd';
+import { getDensityColor } from '@/shared/lib/density';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import AlertCreationForm from '@/components/operations/AlertCreationForm';
+import AlertCreationForm from '@/features/operations/components/AlertCreationForm';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

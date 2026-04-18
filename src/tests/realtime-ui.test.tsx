@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { NotificationCenter } from '../components/attendee/NotificationCenter';
-import { StaffAlertPanel } from '../components/operations/StaffAlertPanel';
+import { NotificationCenter } from '@/components/attendee/NotificationCenter';
+import { StaffAlertPanel } from '@/features/operations/components/StaffAlertPanel';
 import React from 'react';
 
 // Mock useEventSource
-vi.mock('../hooks/useEventSource', () => ({
+vi.mock('@/shared/hooks/useEventSource', () => ({
   useEventSource: vi.fn(() => ({ data: null }))
 }));
 

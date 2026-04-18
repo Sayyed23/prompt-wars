@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { getAllZones, getZone } from '../../lib/venue';
-import { DensityLevel } from '../../types/crowd';
-import { calculateDensityLevel } from '../../lib/density';
+import { getAllZones, getZone } from '@/shared/lib/venue';
+import { DensityLevel } from '@/shared/types/crowd';
+import { calculateDensityLevel } from '@/shared/lib/density';
 
 /**
  * Property 8: Route Generation Timing
@@ -20,8 +20,8 @@ describe('Property 8: Route Generation Timing', () => {
 
     fc.assert(
       fc.property(
-        fc.constantFrom(...zones.map(z => z.id)),
-        fc.constantFrom(...zones.map(z => z.id)),
+        fc.constantFrom(...zones.map((z: any) => z.id)),
+        fc.constantFrom(...zones.map((z: any) => z.id)),
         (from, to) => {
           if (from === to) return true;
           const start = performance.now();

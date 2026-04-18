@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAlert } from '@/lib/alerts';
-import { AlertType, AlertPriority } from '@/types/alerts';
+import { createAlert } from '@/shared/lib/alerts';
+import { AlertType, AlertPriority } from '@/shared/types/alerts';
 
 /**
  * POST /api/alerts/create

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import SystemMonitoringView from '@/components/operations/SystemMonitoringView';
+import SystemMonitoringView from '@/features/operations/components/SystemMonitoringView';
 import { 
   Activity, 
   ChevronLeft, 

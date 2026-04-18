@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { calculateDensityLevel, getDensityColor } from '../../lib/density';
-import { DensityLevel } from '../../types/crowd';
-import { DESIGN_TOKENS } from '../../lib/design-tokens';
+import { calculateDensityLevel, getDensityColor } from '@/shared/lib/density';
+import { DensityLevel } from '@/shared/types/crowd';
+import { DESIGN_TOKENS } from '@/shared/lib/design-tokens';
 
 /**
  * Property 3: Critical Density Visual Indicator

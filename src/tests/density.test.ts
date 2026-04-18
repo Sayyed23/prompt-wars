@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { calculateDensityLevel, getDensityColor } from '../lib/density';
-import { DensityLevel } from '../types/crowd';
+import { calculateDensityLevel, getDensityColor } from '@/shared/lib/density';
+import { DensityLevel } from '@/shared/types/crowd';
 
 describe('calculateDensityLevel property tests', () => {
   it('should return LOW for occupancy up to 40% of capacity', () => {

@@ -1,17 +1,16 @@
-import { Coordinates } from './venue';
-
 export interface Waypoint {
   id: string;
   name: string;
-  coordinates: Coordinates;
-  instruction: string;
   zoneId: string;
+  coordinates: { x: number; y: number };
+  instruction: string;
+  originalDensityPercentage?: number;
 }
 
 export interface Route {
   id: string;
-  origin: Coordinates;
-  destination: Coordinates;
+  origin: { x: number; y: number };
+  destination: { x: number; y: number };
   waypoints: Waypoint[];
   estimatedTimeMinutes: number;
   distanceMetres: number;

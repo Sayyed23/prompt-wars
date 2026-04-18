@@ -130,13 +130,13 @@ Write-Status "IAM roles granted"
 # Create service account key
 Write-Info "Creating service account key for GitHub Actions..."
 
-if (Test-Path "gcp-sa-key.json") {
+if (Test-Path ".secrets/gcp-sa-key.json") {
     Write-Warning "Service account key already exists, skipping creation"
-    Write-Warning "Delete gcp-sa-key.json if you want to create a new one"
+    Write-Warning "Delete .secrets/gcp-sa-key.json if you want to create a new one"
 } else {
-    gcloud iam service-accounts keys create gcp-sa-key.json `
+    gcloud iam service-accounts keys create .secrets/gcp-sa-key.json `
         --iam-account=$saEmail
-    Write-Status "Service account key created: gcp-sa-key.json"
+    Write-Status "Service account key created: .secrets/gcp-sa-key.json"
     Write-Warning "Keep this file secure! Add it to GitHub Secrets as GCP_SA_KEY"
 }
 
@@ -166,12 +166,12 @@ Write-Host "  Setup Complete!" -ForegroundColor Green
 Write-Host "========================================`n" -ForegroundColor Green
 
 Write-Info "Next steps:"
-Write-Host "  1. Review and update terraform\terraform.tfvars with your configuration"
-Write-Host "  2. Run: cd terraform; terraform init; terraform apply"
+Write-Host "  1. Review and update infra\terraform\terraform.tfvars with your configuration"
+Write-Host "  2. Run: cd infra\terraform; terraform init; terraform apply"
 Write-Host "  3. Create secrets (REDIS_URL, DATABASE_URL, GEMINI_API_KEY)"
-Write-Host "  4. Add gcp-sa-key.json contents to GitHub Secrets as GCP_SA_KEY"
+Write-Host "  4. Add .secrets\gcp-sa-key.json contents to GitHub Secrets as GCP_SA_KEY"
 Write-Host ""
-Write-Info "For detailed instructions, see: GCP_SETUP_GUIDE.md"
+Write-Info "For detailed instructions, see: docs\setup\gcp-setup.md"
 Write-Host ""
 
 # Display important information
@@ -180,11 +180,11 @@ Write-Host "  Project ID: $PROJECT_ID"
 Write-Host "  Region: $REGION"
 Write-Host "  Service Account: $saEmail"
 Write-Host "  Artifact Registry: ${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REPO}"
-Write-Host "  Service Account Key: gcp-sa-key.json (keep secure!)"
+Write-Host "  Service Account Key: .secrets/gcp-sa-key.json (keep secure!)"
 Write-Host ""
 
 Write-Warning "Remember to:"
-Write-Host "  - Keep gcp-sa-key.json secure and never commit it to git"
-Write-Host "  - Add gcp-sa-key.json to .gitignore"
+Write-Host "  - Keep .secrets/gcp-sa-key.json secure and never commit it to git"
+Write-Host "  - Ensure .secrets/ is in .gitignore"
 Write-Host "  - Set up GitHub Secrets before pushing to main branch"
 Write-Host ""

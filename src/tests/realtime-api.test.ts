@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { getRedisClient } from '@/lib/redis';
+import { getRedisClient } from '@/shared/lib/redis';
 
 describe('Real-Time API Endpoints', () => {
   let redis: Awaited<ReturnType<typeof getRedisClient>>;
