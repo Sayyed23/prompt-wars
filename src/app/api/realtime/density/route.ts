@@ -9,35 +9,54 @@ export async function GET(req: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      // Send initial connection event
-      controller.enqueue(encoder.encode('retry: 1000\n\n'));
-      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'connected' })}\n\n`));
+      try {
+        // Send initial connection event
+        controller.enqueue(encoder.encode('retry: 1000\n\n'));
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'connected' })}\n\n`));
 
-      const subscriber = redis.duplicate();
-      await subscriber.connect();
-
-      // Subscribe to density updates channel (matches IoT ingest publish channel)
-      await subscriber.subscribe('crowd-updates', (message) => {
+        const subscriber = redis.duplicate();
         try {
-          // Send as a default event (onmessage) for simplicity and compatibility
-          controller.enqueue(encoder.encode(`data: ${message}\n\n`));
-        } catch (err) {
-          console.error('SSE Broadcast error:', err);
+          await subscriber.connect();
+
+          // Subscribe to density updates channel
+          await subscriber.subscribe('crowd-updates', (message) => {
+            try {
+              controller.enqueue(encoder.encode(`data: ${message}\n\n`));
+            } catch (err) {
+              console.error('SSE Broadcast error:', err);
+            }
+          });
+
+          // Handle close
+          req.signal.addEventListener('abort', async () => {
+            try {
+              clearInterval(heartbeatInterval);
+              await subscriber.unsubscribe('crowd-updates');
+              await subscriber.quit();
+            } catch (e) {
+              console.warn('SSE Cleanup warning:', e);
+            }
+            try { controller.close(); } catch (e) {}
+          });
+
+        } catch (redisErr) {
+          console.error('SSE Redis Connection failed:', redisErr);
+          // Fallback: Just keep the stream alive with heartbeats so client doesn't retry instantly
         }
-      });
 
-      // Keep connection alive with heartbeats every 30 seconds (Requirement 14.1)
-      const heartbeatInterval = setInterval(() => {
-        controller.enqueue(encoder.encode(': heartbeat\n\n'));
-      }, 30000);
+        // Keep connection alive with heartbeats every 30 seconds
+        const heartbeatInterval = setInterval(() => {
+          try {
+            controller.enqueue(encoder.encode(': heartbeat\n\n'));
+          } catch (e) {
+            clearInterval(heartbeatInterval);
+          }
+        }, 30000);
 
-      // Handle close
-      req.signal.addEventListener('abort', async () => {
-        clearInterval(heartbeatInterval);
-        await subscriber.unsubscribe('crowd-updates');
-        await subscriber.quit();
-        controller.close();
-      });
+      } catch (err) {
+        console.error('SSE Stream Error:', err);
+        try { controller.close(); } catch (e) {}
+      }
     },
   });
 

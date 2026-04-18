@@ -11,27 +11,44 @@ export async function getGlobalDensitySnapshot(): Promise<DensitySnapshot> {
   let totalOccupancy = 0;
   const now = new Date().toISOString();
 
-  const zoneDensities = await Promise.all(
-    zones.map(async (zone) => {
-      const cached = await getCache(`zone:density:${zone.id}`);
-      
-      if (cached) {
-        const data: ZoneDensity = JSON.parse(cached);
-        totalOccupancy += data.occupancy;
-        return data;
-      }
+  let zoneDensities;
+  try {
+    zoneDensities = await Promise.all(
+      zones.map(async (zone) => {
+        try {
+          const cached = await getCache(`zone:density:${zone.id}`);
+          
+          if (cached) {
+            const data: ZoneDensity = JSON.parse(cached);
+            totalOccupancy += data.occupancy;
+            return data;
+          }
+        } catch (err) {
+          console.warn(`Failed to fetch cache for zone ${zone.id}:`, err);
+        }
 
-      // Default if no data has been received yet for this zone
-      return {
-        zoneId: zone.id,
-        occupancy: 0,
-        capacity: zone.capacity,
-        densityPercentage: 0,
-        level: DensityLevel.LOW,
-        timestamp: now,
-      };
-    })
-  );
+        // Default if no data has been received yet for this zone
+        return {
+          zoneId: zone.id,
+          occupancy: 0,
+          capacity: zone.capacity,
+          densityPercentage: 0,
+          level: DensityLevel.LOW,
+          timestamp: now,
+        };
+      })
+    );
+  } catch (err) {
+    console.error('Failed to aggregate zone densities:', err);
+    zoneDensities = zones.map(zone => ({
+      zoneId: zone.id,
+      occupancy: 0,
+      capacity: zone.capacity,
+      densityPercentage: 0,
+      level: DensityLevel.LOW,
+      timestamp: now,
+    }));
+  }
 
   return {
     timestamp: now,

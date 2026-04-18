@@ -8,15 +8,18 @@ export interface SSEMessage<T> {
 }
 
 export function useEventSource<T>(url: string) {
-  const [data, setData] = useState<T | null>(null);
-  const [status, setStatus] = useState<'connecting' | 'connected' | 'error' | 'closed'>('connecting');
-  const [error, setError] = useState<Error | null>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 5;
 
   const connect = useCallback(() => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
+    }
+
+    if (retryCount >= maxRetries) {
+      console.error('SSE: Max retries reached');
+      setStatus('closed');
+      return;
     }
 
     setStatus('connecting');
@@ -26,6 +29,7 @@ export function useEventSource<T>(url: string) {
     es.onopen = () => {
       setStatus('connected');
       setError(null);
+      setRetryCount(0); // Reset retry count on success
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
@@ -37,15 +41,20 @@ export function useEventSource<T>(url: string) {
       setError(new Error('Connection failed'));
       es.close();
       
-      // Auto-reconnect after 3 seconds
+      // Auto-reconnect with exponential backoff
+      const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
+      setRetryCount(prev => prev + 1);
+      
       reconnectTimeoutRef.current = setTimeout(() => {
         connect();
-      }, 3000);
+      }, delay);
     };
 
     es.onmessage = (event) => {
       try {
         const parsed = JSON.parse(event.data);
+        // Ignore connection setup messages
+        if (parsed.type === 'connected') return;
         setData(parsed);
       } catch (err) {
         console.error('Failed to parse SSE message:', err);
@@ -55,7 +64,7 @@ export function useEventSource<T>(url: string) {
     return () => {
       es.close();
     };
-  }, [url]);
+  }, [url, retryCount]);
 
   useEffect(() => {
     connect();
@@ -69,5 +78,11 @@ export function useEventSource<T>(url: string) {
     };
   }, [connect]);
 
-  return { data, status, error };
+  // Memoize return values to prevent unnecessary re-renders in consumers
+  return { 
+    data, 
+    status, 
+    error,
+    isInitialLoading: status === 'connecting' && !data 
+  };
 }
