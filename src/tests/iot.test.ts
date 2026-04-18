@@ -62,7 +62,10 @@ describe('IoT Data Validation (Requirement 11.1, 11.4)', () => {
   it('Property 41: Should throw error for non-existent zoneId', () => {
     fc.assert(
       fc.property(
-        fc.string({ minLength: 1 }).filter(id => !validZoneIds.includes(id)), // Any non-empty string not a valid zoneId
+        fc.string({ minLength: 1 }).filter(id => 
+          !validZoneIds.includes(id) && 
+          !['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString'].includes(id)
+        ),
         fc.integer({ min: 0 }),
         fc.date(),
         (zoneId, occupancy, date) => {

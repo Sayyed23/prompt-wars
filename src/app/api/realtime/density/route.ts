@@ -19,9 +19,8 @@ export async function GET(req: NextRequest) {
       // Subscribe to density updates channel (matches IoT ingest publish channel)
       await subscriber.subscribe('crowd-updates', (message) => {
         try {
-          const data = JSON.parse(message);
-          controller.enqueue(encoder.encode(`event: density_update\n`));
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+          // Send as a default event (onmessage) for simplicity and compatibility
+          controller.enqueue(encoder.encode(`data: ${message}\n\n`));
         } catch (err) {
           console.error('SSE Broadcast error:', err);
         }

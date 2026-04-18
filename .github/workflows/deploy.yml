@@ -36,6 +36,8 @@ jobs:
   build-and-push:
     needs: lint-and-test
     runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ github.sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -73,6 +75,9 @@ jobs:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
@@ -82,4 +87,45 @@ jobs:
           metadata: cloudrun.yaml
 
       - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
+        run: echo "Deployed to ${{ steps.deploy.outputs.url }}"
+
+      - name: Health Check
+        run: |
+          echo "Waiting 15s for startup..."
+          sleep 15
+          HEALTH_URL="${{ steps.deploy.outputs.url }}/api/health"
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${HEALTH_URL}" --max-time 10)
+          echo "Health check response: HTTP ${HTTP_CODE}"
+          if [ "${HTTP_CODE}" != "200" ]; then
+            echo "::error::Health check failed with HTTP ${HTTP_CODE}"
+            exit 1
+          fi
+          echo "Health check passed"
+
+      - name: Smoke Test - API Density
+        run: |
+          API_URL="${{ steps.deploy.outputs.url }}/api/crowd/density"
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${API_URL}" --max-time 10)
+          echo "Density API response: HTTP ${HTTP_CODE}"
+          if [ "${HTTP_CODE}" -ge 500 ]; then
+            echo "::error::Smoke test failed with HTTP ${HTTP_CODE}"
+            exit 1
+          fi
+
+      - name: Rollback on Failure
+        if: failure()
+        run: |
+          echo "Deployment failed. Attempting rollback..."
+          PREVIOUS_REV=$(gcloud run revisions list \
+            --service=${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --format="value(REVISION)" \
+            --limit=2 | tail -1)
+          if [ -n "${PREVIOUS_REV}" ]; then
+            gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
+              --region=${{ env.REGION }} \
+              --to-revisions="${PREVIOUS_REV}=100"
+            echo "Rolled back to ${PREVIOUS_REV}"
+          else
+            echo "No previous revision found for rollback"
+          fi

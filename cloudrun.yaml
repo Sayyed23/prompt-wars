@@ -13,9 +13,12 @@ spec:
         autoscaling.knative.dev/maxScale: '100'
         run.googleapis.com/vpc-access-connector: crowdflow-connector
         run.googleapis.com/vpc-access-egress: all-traffic
+        run.googleapis.com/startup-cpu-boost: 'true'
+        run.googleapis.com/cpu-throttling: 'false'
     spec:
       serviceAccountName: crowdflow-runner@prompt-wars-493611.iam.gserviceaccount.com
       containerConcurrency: 80
+      timeoutSeconds: 60
       containers:
       - image: asia-south1-docker.pkg.dev/prompt-wars-493611/crowdflow/platform:latest
         ports:
@@ -27,6 +30,8 @@ spec:
         env:
         - name: NODE_ENV
           value: production
+        - name: GCP_PROJECT_ID
+          value: prompt-wars-493611
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
@@ -42,16 +47,32 @@ spec:
             secretKeyRef:
               name: GEMINI_API_KEY
               key: latest
+        - name: IOT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: IOT_API_KEY
+              key: latest
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: SESSION_SECRET
+              key: latest
         startupProbe:
           httpGet:
-            path: /
+            path: /api/health
             port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 6
         livenessProbe:
           httpGet:
-            path: /
+            path: /api/health
             port: 8080
           periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          periodSeconds: 10
           failureThreshold: 3

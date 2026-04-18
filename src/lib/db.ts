@@ -93,6 +93,13 @@ export async function purgeOldData(retentionMinutes: number = 5): Promise<void> 
 }
 
 /**
+ * Returns the connection pool for direct queries (e.g. health checks).
+ */
+export function getPool(): Pool {
+  return pool;
+}
+
+/**
  * Closes the database pool (useful for cleanup).
  */
 export async function closeDb(): Promise<void> {

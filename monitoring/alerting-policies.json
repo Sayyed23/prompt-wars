@@ -1,0 +1,156 @@
+{
+  "alertPolicies": [
+    {
+      "displayName": "High Error Rate (>5% for 5 min)",
+      "combiner": "OR",
+      "conditions": [
+        {
+          "displayName": "Error rate exceeds 5%",
+          "conditionThreshold": {
+            "filter": "resource.type=\"cloud_run_revision\" AND metric.type=\"run.googleapis.com/request_count\" AND metric.labels.response_code_class!=\"2xx\"",
+            "comparison": "COMPARISON_GT",
+            "thresholdValue": 0.05,
+            "duration": "300s",
+            "aggregations": [
+              {
+                "alignmentPeriod": "60s",
+                "perSeriesAligner": "ALIGN_RATE",
+                "crossSeriesReducer": "REDUCE_SUM"
+              }
+            ]
+          }
+        }
+      ],
+      "severity": "CRITICAL",
+      "documentation": {
+        "content": "Error rate has exceeded 5% for 5 consecutive minutes. Check Cloud Logging for error details. Consider rollback if issue persists.",
+        "mimeType": "text/markdown"
+      }
+    },
+    {
+      "displayName": "High P95 Latency (>1000ms for 5 min)",
+      "combiner": "OR",
+      "conditions": [
+        {
+          "displayName": "P95 latency exceeds 1000ms",
+          "conditionThreshold": {
+            "filter": "resource.type=\"cloud_run_revision\" AND metric.type=\"run.googleapis.com/request_latencies\"",
+            "comparison": "COMPARISON_GT",
+            "thresholdValue": 1000,
+            "duration": "300s",
+            "aggregations": [
+              {
+                "alignmentPeriod": "60s",
+                "perSeriesAligner": "ALIGN_PERCENTILE_95"
+              }
+            ]
+          }
+        }
+      ],
+      "severity": "WARNING",
+      "documentation": {
+        "content": "P95 latency has exceeded 1000ms for 5 minutes. Check Redis latency and database connection pool usage."
+      }
+    },
+    {
+      "displayName": "Instance Scaling Warning (>80 instances)",
+      "combiner": "OR",
+      "conditions": [
+        {
+          "displayName": "Instance count exceeds 80",
+          "conditionThreshold": {
+            "filter": "resource.type=\"cloud_run_revision\" AND metric.type=\"run.googleapis.com/container/instance_count\"",
+            "comparison": "COMPARISON_GT",
+            "thresholdValue": 80,
+            "duration": "60s",
+            "aggregations": [
+              {
+                "alignmentPeriod": "60s",
+                "perSeriesAligner": "ALIGN_MEAN"
+              }
+            ]
+          }
+        }
+      ],
+      "severity": "WARNING",
+      "documentation": {
+        "content": "Instance count approaching max (100). Consider increasing max instances or optimizing request handling."
+      }
+    },
+    {
+      "displayName": "Redis Memory Critical (>80%)",
+      "combiner": "OR",
+      "conditions": [
+        {
+          "displayName": "Redis memory usage exceeds 80%",
+          "conditionThreshold": {
+            "filter": "resource.type=\"redis_instance\" AND metric.type=\"redis.googleapis.com/stats/memory/usage_ratio\"",
+            "comparison": "COMPARISON_GT",
+            "thresholdValue": 0.8,
+            "duration": "300s",
+            "aggregations": [
+              {
+                "alignmentPeriod": "300s",
+                "perSeriesAligner": "ALIGN_MEAN"
+              }
+            ]
+          }
+        }
+      ],
+      "severity": "WARNING",
+      "documentation": {
+        "content": "Redis memory usage exceeds 80%. Review TTL policies and eviction settings."
+      }
+    },
+    {
+      "displayName": "Database Connection Pool Exhaustion (>90%)",
+      "combiner": "OR",
+      "conditions": [
+        {
+          "displayName": "Connection pool usage exceeds 90%",
+          "conditionThreshold": {
+            "filter": "resource.type=\"cloudsql_database\" AND metric.type=\"cloudsql.googleapis.com/database/postgresql/num_backends\"",
+            "comparison": "COMPARISON_GT",
+            "thresholdValue": 18,
+            "duration": "120s",
+            "aggregations": [
+              {
+                "alignmentPeriod": "60s",
+                "perSeriesAligner": "ALIGN_MEAN"
+              }
+            ]
+          }
+        }
+      ],
+      "severity": "CRITICAL",
+      "documentation": {
+        "content": "Database connection pool near exhaustion (>90%). Possible connection leak. Check idle timeout settings."
+      }
+    },
+    {
+      "displayName": "Container Crash Rate (>2%)",
+      "combiner": "OR",
+      "conditions": [
+        {
+          "displayName": "Container crash rate exceeds 2%",
+          "conditionThreshold": {
+            "filter": "resource.type=\"cloud_run_revision\" AND metric.type=\"run.googleapis.com/container/instance_count\" AND metric.labels.state=\"crashed\"",
+            "comparison": "COMPARISON_GT",
+            "thresholdValue": 0.02,
+            "duration": "300s",
+            "aggregations": [
+              {
+                "alignmentPeriod": "300s",
+                "perSeriesAligner": "ALIGN_RATE"
+              }
+            ]
+          }
+        }
+      ],
+      "severity": "CRITICAL",
+      "documentation": {
+        "content": "Container crash rate exceeds 2%. Check application logs for OOM kills or unhandled exceptions. Consider rollback."
+      }
+    }
+  ]
+}
