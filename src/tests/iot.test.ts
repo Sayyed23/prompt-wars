@@ -73,12 +73,33 @@ describe('IoT Data Validation (Requirement 11.1, 11.4)', () => {
     );
   });
 
-  it('Property 41: Should throw error for invalid timestamp format', () => {
+  it('Property 39: IoT Data Processing Timing (Requirement 11.2)', () => {
+    // Property: Validation should be extremely fast (< 1ms) to support high throughput
     const payload = { 
       zoneId: validZoneIds[0], 
       occupancy: 100, 
-      timestamp: 'not-a-date' 
+      timestamp: new Date().toISOString() 
     };
-    expect(() => validateIoTData(payload)).toThrow(/must be a valid ISO 8601 string/);
+    
+    const start = performance.now();
+    for (let i = 0; i < 1000; i++) {
+      validateIoTData(payload);
+    }
+    const end = performance.now();
+    const averageTime = (end - start) / 1000;
+    
+    expect(averageTime).toBeLessThan(1); // average < 1ms
+  });
+
+  it('Property 40: IoT Data Update Throughput (Requirement 11.3)', () => {
+    // Property: Should handle valid data for multiple zones without conflict
+    const batch = validZoneIds.map(id => ({
+      zoneId: id,
+      occupancy: 50,
+      timestamp: new Date().toISOString()
+    }));
+
+    const results = batch.map(p => validateIoTData(p));
+    expect(results).toHaveLength(validZoneIds.length);
   });
 });

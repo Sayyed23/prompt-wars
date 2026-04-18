@@ -1,615 +1,526 @@
-# Google Cloud Platform Setup Guide for CrowdFlow
+# GCP Infrastructure Setup Guide for CrowdFlow Platform
 
-This guide walks you through setting up all infrastructure components for the CrowdFlow platform on Google Cloud Platform (Task 3 from the implementation plan).
+This guide walks you through setting up all Google Cloud Platform infrastructure for the CrowdFlow platform (Task 3 from the implementation plan).
 
 ## Prerequisites
 
 - Google Cloud account with billing enabled
 - `gcloud` CLI installed ([Install Guide](https://cloud.google.com/sdk/docs/install))
+- Docker installed locally
 - Terraform installed ([Install Guide](https://developer.hashicorp.com/terraform/install))
 - GitHub repository for the project
-- Project ID: `prompt-wars-493611` (or replace with your project ID)
 
 ## Table of Contents
 
 1. [Initial GCP Project Setup](#1-initial-gcp-project-setup)
 2. [Enable Required APIs](#2-enable-required-apis)
-3. [Create Service Account](#3-create-service-account)
-4. [Set Up Artifact Registry](#4-set-up-artifact-registry)
+3. [Set Up Service Account](#3-set-up-service-account)
+4. [Configure Terraform Backend](#4-configure-terraform-backend)
 5. [Deploy Infrastructure with Terraform](#5-deploy-infrastructure-with-terraform)
-6. [Configure Secrets](#6-configure-secrets)
-7. [Set Up GitHub Actions](#7-set-up-github-actions)
-8. [Verify Deployment](#8-verify-deployment)
+6. [Set Up Secrets in Secret Manager](#6-set-up-secrets-in-secret-manager)
+7. [Configure GitHub Actions](#7-configure-github-actions)
+8. [Test Docker Build Locally](#8-test-docker-build-locally)
+9. [Deploy to Cloud Run](#9-deploy-to-cloud-run)
+10. [Verify Deployment](#10-verify-deployment)
 
 ---
 
 ## 1. Initial GCP Project Setup
 
-### 1.1 Authenticate with Google Cloud
-
+### 1.1 Login to GCP
 ```bash
 gcloud auth login
 ```
 
-This opens your browser for authentication.
-
-### 1.2 Set Your Project
-
+### 1.2 Set Your Project ID
 ```bash
-gcloud config set project prompt-wars-493611
+# Replace with your actual project ID
+export PROJECT_ID="prompt-wars-493611"
+gcloud config set project $PROJECT_ID
 ```
 
-Replace `prompt-wars-493611` with your actual project ID.
+### 1.3 Set Default Region
+```bash
+export REGION="us-east1"
+gcloud config set compute/region $REGION
+```
 
-### 1.3 Verify Project Configuration
-
+### 1.4 Verify Configuration
 ```bash
 gcloud config list
-```
-
-You should see your project ID and default region.
-
-### 1.4 Set Default Region
-
-```bash
-gcloud config set compute/region asia-south1
 ```
 
 ---
 
 ## 2. Enable Required APIs
 
-Enable all necessary Google Cloud APIs for the project:
+Enable all necessary Google Cloud APIs:
 
 ```bash
 # Enable Cloud Run API
 gcloud services enable run.googleapis.com
 
-# Enable Artifact Registry API
+# Enable Container Registry / Artifact Registry
 gcloud services enable artifactregistry.googleapis.com
+gcloud services enable containerregistry.googleapis.com
 
-# Enable Cloud Build API
-gcloud services enable cloudbuild.googleapis.com
-
-# Enable Compute Engine API (for VPC)
+# Enable Compute Engine (for VPC)
 gcloud services enable compute.googleapis.com
 
-# Enable VPC Access API
+# Enable VPC Access
 gcloud services enable vpcaccess.googleapis.com
 
-# Enable Redis (Memorystore) API
+# Enable Redis (Memorystore)
 gcloud services enable redis.googleapis.com
 
-# Enable Cloud SQL Admin API
+# Enable Cloud SQL
 gcloud services enable sqladmin.googleapis.com
 
-# Enable Secret Manager API
+# Enable Secret Manager
 gcloud services enable secretmanager.googleapis.com
 
-# Enable Cloud Resource Manager API
-gcloud services enable cloudresourcemanager.googleapis.com
+# Enable Cloud Build (for CI/CD)
+gcloud services enable cloudbuild.googleapis.com
+
+# Enable Cloud Logging and Monitoring
+gcloud services enable logging.googleapis.com
+gcloud services enable monitoring.googleapis.com
 ```
 
-**Wait 2-3 minutes** for APIs to be fully enabled before proceeding.
-
-### Verify APIs are Enabled
-
+**Verify APIs are enabled:**
 ```bash
-gcloud services list --enabled | grep -E "(run|artifact|redis|sql|secret)"
+gcloud services list --enabled
 ```
 
 ---
 
-## 3. Create Service Account
+## 3. Set Up Service Account
 
 ### 3.1 Create Service Account for Cloud Run
-
-### 3. Service Account (Least Privilege)
-
-We recommend using **Workload Identity Federation** (WIF) for CI/CD. If you must use a JSON key, follow these steps:
-
-1. Create a service account (SA) for the application:
-   ```bash
-   gcloud iam service-accounts create crowdflow-sa \
-       --display-name="CrowdFlow Service Account"
-   ```
-
-2. Assign narrowed roles (Least Privilege):
-   ```bash
-   PROJECT_ID=$(gcloud config get-value project)
-   
-   # Required for Cloud Run to access secrets and DB
-   gcloud projects add-iam-policy-binding $PROJECT_ID \
-       --member="serviceAccount:crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
-       --role="roles/secretmanager.secretAccessor"
-   
-   gcloud projects add-iam-policy-binding $PROJECT_ID \
-       --member="serviceAccount:crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
-       --role="roles/cloudsql.client"
-       
-   # Use viewer instead of editor for Redis if only monitoring/connecting
-   gcloud projects add-iam-policy-binding $PROJECT_ID \
-       --member="serviceAccount:crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
-       --role="roles/redis.viewer"
-   ```
-
-### 5.1 Workload Identity Federation (Recommended)
-
-Avoid long-lived JSON keys by setting up WIF for GitHub Actions:
-
 ```bash
-# Set up a Workload Identity Pool
-gcloud iam workload-identity-pools create "github-pool" \
-    --location="global" --display-name="GitHub Pool"
-
-# Set up a Provider for GitHub
-gcloud iam workload-identity-pools providers create-oidc "github-provider" \
-    --location="global" --workload-identity-pool="github-pool" \
-    --issuer-uri="https://token.actions.githubusercontent.com" \
-    --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository"
-
-# Allow GitHub to impersonate the Service Account
-gcloud iam service-accounts add-iam-policy-binding "crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
-    --project=$PROJECT_ID \
-    --role="roles/iam.workloadIdentityUser" \
-    --member="principalSet://iam.googleapis.com/projects/$(gcloud projects list --filter=$PROJECT_ID --format='value(projectNumber)')/locations/global/workloadIdentityPools/github-pool/attribute.repository/YOUR_GITHUB_REPO"
+gcloud iam service-accounts create crowdflow-sa \
+  --display-name="CrowdFlow Platform Service Account" \
+  --description="Service account for CrowdFlow Cloud Run application"
 ```
 
-Replace `YOUR_GITHUB_REPO` with your repository (e.g., `username/repo`).
-
-**⚠️ IMPORTANT:** Keep this file secure! You'll upload it to GitHub Secrets later.
-
-### 3.4 Grant Additional Permissions for Deployment
-
+### 3.2 Grant Required Permissions
 ```bash
-# Grant Cloud Run Admin (for deployments)
+# Secret Manager access
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
+  --member="serviceAccount:crowdflow-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+
+# Cloud SQL Client
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:crowdflow-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/cloudsql.client"
+
+# Redis access (via VPC)
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:crowdflow-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/redis.editor"
+```
+
+### 3.3 Create Service Account for GitHub Actions
+```bash
+gcloud iam service-accounts create github-actions-sa \
+  --display-name="GitHub Actions Deployment" \
+  --description="Service account for GitHub Actions CI/CD"
+```
+
+### 3.4 Grant Deployment Permissions
+```bash
+# Cloud Run Admin
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:github-actions-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/run.admin"
 
-# Grant Service Account User (to deploy as service account)
+# Artifact Registry Writer
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
+  --member="serviceAccount:github-actions-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer"
+
+# Service Account User (to deploy as crowdflow-sa)
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:github-actions-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/iam.serviceAccountUser"
 
-# Grant Artifact Registry Writer (to push images)
+# Storage Admin (for container images)
 gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/artifactregistry.writer"
+  --member="serviceAccount:github-actions-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/storage.admin"
 ```
+
+### 3.5 Create and Download Key for GitHub Actions
+```bash
+gcloud iam service-accounts keys create GCP_SA_KEY.json \
+  --iam-account=github-actions-sa@${PROJECT_ID}.iam.gserviceaccount.com
+```
+
+**⚠️ IMPORTANT:** Keep this file secure! You'll add it to GitHub Secrets later.
 
 ---
 
-## 4. Set Up Artifact Registry
+## 4. Configure Terraform Backend
 
-### 4.1 Create Docker Repository
-
+### 4.1 Create GCS Bucket for Terraform State
 ```bash
-gcloud artifacts repositories create crowdflow \
-  --repository-format=docker \
-  --location=asia-south1 \
-  --description="Docker repository for CrowdFlow platform"
+gsutil mb -p $PROJECT_ID -l $REGION gs://${PROJECT_ID}-terraform-state
 ```
 
-### 4.2 Configure Docker Authentication
-
+### 4.2 Enable Versioning
 ```bash
-gcloud auth configure-docker asia-south1-docker.pkg.dev
+gsutil versioning set on gs://${PROJECT_ID}-terraform-state
 ```
 
-### 4.3 Verify Repository Creation
+### 4.3 Update Terraform Configuration
+Add this to `terraform/main.tf` at the top (after provider block):
 
-```bash
-gcloud artifacts repositories list --location=asia-south1
+```hcl
+terraform {
+  backend "gcs" {
+    bucket = "prompt-wars-493611-terraform-state"
+    prefix = "crowdflow/state"
+  }
+}
 ```
-
-You should see the `crowdflow` repository listed.
 
 ---
 
 ## 5. Deploy Infrastructure with Terraform
 
 ### 5.1 Navigate to Terraform Directory
-
 ```bash
 cd terraform
 ```
 
-### 8. Configure Terraform Variables
-
-1. Create a `terraform.tfvars` file in the `terraform/` directory.
-2. **IMPORTANT: Add `terraform/terraform.tfvars` to your `.gitignore` file now!**
-3. Populate it with your project details and a **secure generated password**.
-
+### 5.2 Create terraform.tfvars File
 ```bash
-# Generate a secure password
-openssl rand -base64 32
-```
-
-```hcl
-# terraform/terraform.tfvars
-project_id  = "your-project-id"
-region      = "asia-south1"
-db_password = "PASTE_THE_GENERATED_SECURE_PASSWORD_HERE"
+cat > terraform.tfvars <<EOF
+project_id = "$PROJECT_ID"
+region     = "$REGION"
+db_password = "$(openssl rand -base64 32)"
+EOF
 ```
 
 ### 5.3 Initialize Terraform
-
 ```bash
 terraform init
 ```
 
-This downloads the Google Cloud provider and initializes the backend.
-
 ### 5.4 Format Terraform Files
-
 ```bash
 terraform fmt
 ```
 
 ### 5.5 Validate Configuration
-
 ```bash
 terraform validate
 ```
 
-You should see: `Success! The configuration is valid.`
-
-### 5.6 Preview Infrastructure Changes
-
+### 5.6 Plan Infrastructure
 ```bash
-terraform plan
+terraform plan -out=tfplan
 ```
 
-Review the resources that will be created:
+**Review the plan carefully!** This will create:
 - VPC Network
 - VPC Access Connector
-- Memorystore Redis (5GB, Standard HA)
+- Memorystore Redis (5GB, Standard HA) - **⚠️ This costs ~$150/month**
 - Cloud SQL PostgreSQL
 - Artifact Registry
-- Cloud Run Service
+- Cloud Run service
 
-### 5.7 Apply Terraform Configuration
-
+### 5.7 Apply Infrastructure
 ```bash
-terraform apply
+terraform apply tfplan
 ```
 
-Type `yes` when prompted.
+**⏱️ This takes 10-15 minutes.** Redis and Cloud SQL take the longest.
 
-**⏱️ This will take 10-15 minutes** as it provisions:
-- Redis instance (takes ~5-8 minutes)
-- Cloud SQL instance (takes ~5-8 minutes)
-- VPC and networking components
-
-### 5.8 Save Terraform Outputs
-
+### 5.8 Save Outputs
 ```bash
-terraform output
+terraform output redis_host > ../redis_host.txt
+terraform output db_connection_name > ../db_connection.txt
 ```
-
-Save these values - you'll need them for secrets:
-- `redis_host`: Redis instance IP address
-- `db_connection_name`: Cloud SQL connection string
 
 ---
 
-## 6. Configure Secrets
+## 6. Set Up Secrets in Secret Manager
 
-### 6.1 Create Secret for Redis URL
-
+### 6.1 Create Redis URL Secret
 ```bash
-# Get Redis host from Terraform output
 REDIS_HOST=$(terraform output -raw redis_host)
-
-# Create Redis URL secret
-echo "redis://$REDIS_HOST:6379" | gcloud secrets create REDIS_URL \
+echo "redis://${REDIS_HOST}:6379" | gcloud secrets create REDIS_URL \
   --data-file=- \
   --replication-policy="automatic"
 ```
 
-### 6.2 Create Secret for Database URL
-
+### 6.2 Create Database URL Secret
 ```bash
-# Get database connection details
-DB_CONNECTION_NAME=$(terraform output -raw db_connection_name)
-DB_PASSWORD="YOUR_DB_PASSWORD_FROM_TFVARS"
-
-# Create Database URL secret
-echo "postgresql://crowdflow_user:$DB_PASSWORD@localhost/crowdflow?host=/cloudsql/$DB_CONNECTION_NAME" | \
+DB_CONNECTION=$(terraform output -raw db_connection_name)
+DB_PASSWORD=$(grep db_password terraform.tfvars | cut -d'"' -f2)
+echo "postgresql://crowdflow_user:${DB_PASSWORD}@/crowdflow?host=/cloudsql/${DB_CONNECTION}" | \
   gcloud secrets create DATABASE_URL \
   --data-file=- \
   --replication-policy="automatic"
 ```
 
-### 6.3 Create Secret for Gemini API Key
-
+### 6.3 Create Gemini API Key Secret
 ```bash
-# Replace with your actual Gemini API key
-echo "YOUR_GEMINI_API_KEY_HERE" | gcloud secrets create GEMINI_API_KEY \
+# Get your Gemini API key from: https://aistudio.google.com/app/apikey
+read -s GEMINI_KEY
+echo $GEMINI_KEY | gcloud secrets create GEMINI_API_KEY \
   --data-file=- \
   --replication-policy="automatic"
 ```
 
-**📝 Note:** Get your Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-
 ### 6.4 Grant Service Account Access to Secrets
-
 ```bash
-PROJECT_ID=$(gcloud config get-value project)
-
-# Grant access to all secrets
 for SECRET in REDIS_URL DATABASE_URL GEMINI_API_KEY; do
   gcloud secrets add-iam-policy-binding $SECRET \
-    --member="serviceAccount:crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
+    --member="serviceAccount:crowdflow-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
     --role="roles/secretmanager.secretAccessor"
 done
 ```
 
 ### 6.5 Verify Secrets
-
 ```bash
 gcloud secrets list
 ```
 
-You should see: `REDIS_URL`, `DATABASE_URL`, `GEMINI_API_KEY`
+---
+
+## 7. Configure GitHub Actions
+
+### 7.1 Add GitHub Secrets
+
+Go to your GitHub repository:
+1. Navigate to **Settings** → **Secrets and variables** → **Actions**
+2. Click **New repository secret**
+3. Add the following secret:
+
+**Name:** `GCP_SA_KEY`  
+**Value:** Paste the entire contents of `GCP_SA_KEY.json`
+
+```bash
+# Display the key to copy (on Windows)
+cat GCP_SA_KEY.json
+```
+
+### 7.2 Verify Workflow File
+
+Ensure `.github/workflows/deploy.yml` has the correct project ID and region:
+
+```yaml
+env:
+  PROJECT_ID: prompt-wars-493611
+  REGION: us-east1
+  SERVICE_NAME: crowdflow-platform
+  DOCKER_IMAGE: us-east1-docker.pkg.dev/prompt-wars-493611/crowdflow/platform
+```
+
+### 7.3 Update cloudrun.yaml
+
+Ensure `cloudrun.yaml` references the correct VPC connector:
+
+```yaml
+annotations:
+  run.googleapis.com/vpc-access-connector: crowdflow-connector
+```
 
 ---
 
-## 7. Set Up GitHub Actions
+## 8. Test Docker Build Locally
 
-### 7.1 Navigate to GitHub Repository Settings
+### 8.1 Build Docker Image
+```bash
+cd ..  # Back to project root
+docker build -t crowdflow-platform:test .
+```
 
-1. Go to your GitHub repository
-2. Click **Settings** → **Secrets and variables** → **Actions**
+### 8.2 Test Container Locally
+```bash
+docker run -p 8080:8080 -e NODE_ENV=production crowdflow-platform:test
+```
 
-### 7.2 Add GCP Service Account Key Secret
+### 8.3 Verify in Browser
+Open: http://localhost:8080
 
-1. Click **New repository secret**
-2. Name: `GCP_SA_KEY`
-3. Value: Copy the entire contents of `gcp-sa-key.json` file
-   ```bash
-   cat gcp-sa-key.json
-   ```
-4. Click **Add secret**
+Press `Ctrl+C` to stop the container.
 
-### 7.3 Verify GitHub Actions Workflow
+---
 
-The workflow file `.github/workflows/deploy.yml` is already configured. It will:
-1. Run on push to `main` branch
-2. Lint and test the code
-3. Build Docker image
-4. Push to Artifact Registry
-5. Deploy to Cloud Run
+## 9. Deploy to Cloud Run
 
-### 7.4 Test the Workflow
+### 9.1 Option A: Deploy via GitHub Actions (Recommended)
 
 ```bash
-# Commit and push to trigger deployment
 git add .
-git commit -m "Initial infrastructure setup"
+git commit -m "feat: add GCP infrastructure and deployment config"
 git push origin main
 ```
 
-### 7.5 Monitor Deployment
+Monitor the deployment:
+1. Go to your GitHub repository
+2. Click **Actions** tab
+3. Watch the workflow run
 
-1. Go to GitHub repository → **Actions** tab
-2. Watch the workflow run
-3. Deployment takes ~5-10 minutes
+### 9.2 Option B: Manual Deployment
+
+```bash
+# Build and push image
+gcloud builds submit --tag us-east1-docker.pkg.dev/$PROJECT_ID/crowdflow/platform:latest
+
+# Deploy to Cloud Run
+gcloud run services replace cloudrun.yaml --region=$REGION
+```
 
 ---
 
-## 8. Verify Deployment
+## 10. Verify Deployment
 
-### 8.1 Check Cloud Run Service
-
-```bash
-gcloud run services list --region=asia-south1
-```
-
-You should see `crowdflow-platform` service.
-
-### 8.2 Get Service URL
-
+### 10.1 Get Service URL
 ```bash
 gcloud run services describe crowdflow-platform \
-  --region=asia-south1 \
-  --format="value(status.url)"
+  --region=$REGION \
+  --format='value(status.url)'
 ```
 
-### 8.3 Test the Application
-
+### 10.2 Test the Endpoint
 ```bash
-# Get the URL
-SERVICE_URL=$(gcloud run services describe crowdflow-platform \
-  --region=asia-south1 \
-  --format="value(status.url)")
-
-# Test the endpoint
+SERVICE_URL=$(gcloud run services describe crowdflow-platform --region=$REGION --format='value(status.url)')
 curl $SERVICE_URL
 ```
 
-### 8.4 View Logs
-
+### 10.3 Check Logs
 ```bash
-gcloud run services logs read crowdflow-platform \
-  --region=asia-south1 \
-  --limit=50
+gcloud run services logs read crowdflow-platform --region=$REGION --limit=50
 ```
 
-### 8.5 Check Resource Status
+### 10.4 Verify VPC Connectivity
 
-```bash
-# Check Redis instance
-gcloud redis instances list --region=asia-south1
-
-# Check Cloud SQL instance
-gcloud sql instances list
-
-# Check VPC connector
-gcloud compute networks vpc-access connectors list --region=asia-south1
-```
-
----
-
-## Quick Reference Commands
-
-### View All Resources
-
-```bash
-# Cloud Run services
-gcloud run services list --region=asia-south1
-
-# Redis instances
-gcloud redis instances list --region=asia-south1
-
-# Cloud SQL instances
-gcloud sql instances list
-
-# Secrets
-gcloud secrets list
-
-# Artifact Registry repositories
-gcloud artifacts repositories list --location=asia-south1
-```
-
-### Update Cloud Run Service
-
+Test Redis connection from Cloud Run:
 ```bash
 gcloud run services update crowdflow-platform \
-  --region=asia-south1 \
-  --min-instances=2 \
-  --max-instances=100
+  --region=$REGION \
+  --set-env-vars="TEST_REDIS=true"
 ```
 
-### View Service Details
-
-```bash
-gcloud run services describe crowdflow-platform \
-  --region=asia-south1
-```
-
-### Rollback Deployment
-
-```bash
-# List revisions
-gcloud run revisions list --service=crowdflow-platform --region=asia-south1
-
-# Rollback to previous revision
-gcloud run services update-traffic crowdflow-platform \
-  --region=asia-south1 \
-  --to-revisions=REVISION_NAME=100
-```
+Check logs for Redis connection success.
 
 ---
 
 ## Troubleshooting
 
-### Issue: API Not Enabled
-
-**Error:** `API [service] is not enabled for project [project-id]`
-
-**Solution:**
-```bash
-gcloud services enable [service-name].googleapis.com
-```
-
-### Issue: Permission Denied
-
-**Error:** `Permission denied` or `403 Forbidden`
-
-**Solution:** Grant required IAM roles:
-```bash
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:crowdflow-sa@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/[required-role]"
-```
-
 ### Issue: Terraform Apply Fails
 
-**Solution:**
-1. Check `terraform.tfvars` is properly configured
-2. Ensure all APIs are enabled
-3. Run `terraform plan` to see detailed errors
-4. Check quota limits in GCP Console
+**Error:** "API not enabled"
+```bash
+# Re-run API enablement
+gcloud services enable redis.googleapis.com sqladmin.googleapis.com
+```
 
-### Issue: Cloud Run Deployment Fails
+**Error:** "Quota exceeded"
+- Check your GCP quotas: https://console.cloud.google.com/iam-admin/quotas
+- Request quota increase if needed
 
-**Solution:**
-1. Check GitHub Actions logs for errors
-2. Verify `GCP_SA_KEY` secret is correctly set
-3. Ensure Docker image was pushed successfully:
-   ```bash
-   gcloud artifacts docker images list asia-south1-docker.pkg.dev/$PROJECT_ID/crowdflow/platform
-   ```
+### Issue: Cloud Run Can't Connect to Redis
 
-### Issue: Cannot Connect to Redis/SQL
+**Check VPC Connector:**
+```bash
+gcloud compute networks vpc-access connectors describe crowdflow-connector \
+  --region=$REGION
+```
 
-**Solution:**
-1. Verify VPC connector is created:
-   ```bash
-   gcloud compute networks vpc-access connectors list --region=asia-south1
-   ```
-2. Check Cloud Run service has VPC connector annotation in `cloudrun.yaml`
-3. Verify secrets are accessible:
-   ```bash
-   gcloud secrets versions access latest --secret=REDIS_URL
-   ```
+**Verify Redis is accessible:**
+```bash
+gcloud redis instances describe crowdflow-cache --region=$REGION
+```
+
+### Issue: GitHub Actions Deployment Fails
+
+**Check service account permissions:**
+```bash
+gcloud projects get-iam-policy $PROJECT_ID \
+  --flatten="bindings[].members" \
+  --filter="bindings.members:github-actions-sa@${PROJECT_ID}.iam.gserviceaccount.com"
+```
+
+### Issue: Secrets Not Accessible
+
+**Grant access again:**
+```bash
+gcloud secrets add-iam-policy-binding REDIS_URL \
+  --member="serviceAccount:crowdflow-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
 
 ---
 
 ## Cost Estimation
 
-Approximate monthly costs (asia-south1 region):
+**Monthly costs (approximate):**
+- Cloud Run: $0-50 (depends on traffic)
+- Memorystore Redis (5GB Standard HA): ~$150
+- Cloud SQL (db-f1-micro): ~$10
+- VPC Access Connector: ~$10
+- Artifact Registry: ~$0.10
+- **Total: ~$170-220/month**
 
-| Resource | Configuration | Estimated Cost |
-|----------|--------------|----------------|
-| Cloud Run | 2-100 instances, 2 vCPU, 2GB RAM | $50-500/month |
-| Memorystore Redis | 5GB Standard HA | ~$200/month |
-| Cloud SQL PostgreSQL | db-f1-micro | ~$25/month |
-| VPC Access Connector | 2-3 instances | ~$20/month |
-| Artifact Registry | Storage + egress | ~$5/month |
-| **Total** | | **~$300-750/month** |
-
-**💡 Tip:** Use `gcloud billing` commands to monitor actual costs.
+**Cost Optimization Tips:**
+- Use Redis Basic tier for development ($30/month instead of $150)
+- Scale down Cloud SQL to shared-core for testing
+- Set Cloud Run min instances to 0 outside event hours
 
 ---
 
 ## Next Steps
 
-After completing this setup:
+After infrastructure is deployed:
 
-1. ✅ **Task 3.1-3.4 Complete** - Infrastructure is deployed
+1. ✅ **Task 3.1-3.4 Complete** - Infrastructure is live
 2. ✅ **Task 4 Complete** - Verification done
-3. ➡️ **Proceed to Task 5** - Implement data storage and caching layer
-4. ➡️ **Proceed to Task 6** - Build IoT data ingestion
+3. ➡️ **Task 5** - Implement data storage and caching layer
+4. ➡️ **Task 6** - Build IoT data ingestion
 
 ---
 
-## Cleanup (When Needed)
-
-To destroy all infrastructure:
+## Quick Reference Commands
 
 ```bash
-cd terraform
+# View all resources
+gcloud run services list
+gcloud redis instances list
+gcloud sql instances list
+
+# View logs
+gcloud run services logs read crowdflow-platform --region=$REGION
+
+# Update environment variables
+gcloud run services update crowdflow-platform \
+  --region=$REGION \
+  --set-env-vars="KEY=value"
+
+# Rollback deployment
+gcloud run services update-traffic crowdflow-platform \
+  --region=$REGION \
+  --to-revisions=PREVIOUS_REVISION=100
+
+# Delete everything (careful!)
 terraform destroy
 ```
-
-Type `yes` when prompted.
-
-**⚠️ WARNING:** This will delete all data and resources!
 
 ---
 
 ## Support Resources
 
-- [Google Cloud Run Documentation](https://cloud.google.com/run/docs)
-- [Memorystore for Redis Documentation](https://cloud.google.com/memorystore/docs/redis)
+- [Cloud Run Documentation](https://cloud.google.com/run/docs)
+- [Memorystore Redis Documentation](https://cloud.google.com/memorystore/docs/redis)
 - [Cloud SQL Documentation](https://cloud.google.com/sql/docs)
-- [Terraform Google Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
-- [GitHub Actions for GCP](https://github.com/google-github-actions)
+- [Secret Manager Documentation](https://cloud.google.com/secret-manager/docs)
+- [Terraform GCP Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
 
 ---
 
-**Last Updated:** April 2026
-**Version:** 1.0
+**🎉 Congratulations!** Your CrowdFlow infrastructure is now deployed on GCP.

@@ -1,0 +1,68 @@
+import { describe, it, expect, vi } from 'vitest';
+import { calculateQueuePrediction } from '../lib/queue';
+import { ConfidenceLevel, Facility, FacilityType } from '../types/queue';
+
+// Mock dependencies
+vi.mock('../lib/redis', () => ({
+  getRedisClient: () => ({
+    get: vi.fn().mockResolvedValue('50'),
+  }),
+}));
+
+vi.mock('../lib/db', () => ({
+  getHistoricalTrends: vi.fn().mockResolvedValue(new Array(120).fill({})), // 120 samples = HIGH confidence
+}));
+
+vi.mock('../lib/venue', () => ({
+  getZone: (id: string) => ({
+    id,
+    name: 'Test Zone',
+    capacity: 100,
+  }),
+}));
+
+describe('Queue Prediction Logic (Requirement 8.1, 2.4)', () => {
+  const mockFacility: Facility = {
+    id: 'food-1',
+    name: 'Burger & Brew',
+    type: FacilityType.FOOD_STALL,
+    zoneId: 'zone-food-1',
+  };
+
+  it('Property 7: Should return whole number wait times (Requirement 2.4)', async () => {
+    const prediction = await calculateQueuePrediction(mockFacility);
+    expect(Number.isInteger(prediction.waitTimeMinutes)).toBe(true);
+    expect(prediction.waitTimeMinutes).toBeGreaterThanOrEqual(0);
+  });
+
+  it('Property 5: Should map confidence levels based on sample count', async () => {
+    const { getHistoricalTrends } = await import('../lib/db');
+    
+    // Test HIGH confidence (>100 samples)
+    vi.mocked(getHistoricalTrends).mockResolvedValue(new Array(150).fill({}));
+    let prediction = await calculateQueuePrediction(mockFacility);
+    expect(prediction.confidence).toBe(ConfidenceLevel.HIGH);
+
+    // Test MEDIUM confidence (50-100)
+    vi.mocked(getHistoricalTrends).mockResolvedValue(new Array(75).fill({}));
+    prediction = await calculateQueuePrediction(mockFacility);
+    expect(prediction.confidence).toBe(ConfidenceLevel.MEDIUM);
+
+    // Test LOW confidence (10-49)
+    vi.mocked(getHistoricalTrends).mockResolvedValue(new Array(25).fill({}));
+    prediction = await calculateQueuePrediction(mockFacility);
+    expect(prediction.confidence).toBe(ConfidenceLevel.LOW);
+
+    // Test INSUFFICIENT confidence (<10)
+    vi.mocked(getHistoricalTrends).mockResolvedValue(new Array(5).fill({}));
+    prediction = await calculateQueuePrediction(mockFacility);
+    expect(prediction.confidence).toBe(ConfidenceLevel.INSUFFICIENT);
+  });
+
+  it('Property 17: Should process prediction logic within 200ms (Requirement 5.2)', async () => {
+    const start = performance.now();
+    await calculateQueuePrediction(mockFacility);
+    const end = performance.now();
+    expect(end - start).toBeLessThan(200);
+  });
+});
