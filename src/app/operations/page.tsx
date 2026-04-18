@@ -5,39 +5,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, 
   Map as MapIcon, 
-  Scale, 
   Bell, 
   Users, 
   Plus, 
-  Shield, 
-  Activity, 
-  Menu, 
+  Settings,
+  Activity,
+  Menu,
   X,
+  Activity as HistoryIcon,
   ChevronRight,
-  Settings
+  Shield
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import AlertCenter from '@/components/operations/AlertCenter';
 import { StaffAlertPanel } from '@/components/operations/StaffAlertPanel';
-import LiveCrowdDashboard from '@/components/operations/LiveCrowdDashboard';
-import QueueManagementPanel from '@/components/operations/QueueManagementPanel';
-import StaffCoordinationView from '@/components/operations/StaffCoordinationView';
-import AlertCreationForm from '@/components/operations/AlertCreationForm';
-
 import { useEventSource } from '@/hooks/useEventSource';
 import { DensitySnapshot, ZoneDensity } from '@/types/crowd';
 import { getDensityColor } from '@/lib/density';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import AlertCreationForm from '@/components/operations/AlertCreationForm';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-type ViewMode = 'overview' | 'heatmap' | 'queues' | 'alerts' | 'staff';
-
 export default function OperationsDashboard() {
-  const [activeView, setActiveView] = useState<ViewMode>('overview');
+  const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [snapshot, setSnapshot] = useState<DensitySnapshot | null>(null);
@@ -55,27 +51,27 @@ export default function OperationsDashboard() {
     if (liveDensity && snapshot) {
       setSnapshot(prev => {
         if (!prev) return null;
-        const zones = [...prev.zones];
-        const idx = zones.findIndex(z => z.zoneId === (liveDensity as any).zoneId);
-        if (idx !== -1) zones[idx] = liveDensity;
-        else zones.push(liveDensity);
+        
+        const newZones = {
+          ...prev.zones,
+          [liveDensity.zoneId]: liveDensity
+        };
         
         return {
           ...prev,
-          zones,
-          totalOccupancy: zones.reduce((acc, z) => acc + z.occupancy, 0),
+          zones: newZones,
+          totalOccupancy: Object.values(newZones).reduce((acc, z) => acc + z.occupancy, 0),
           lastUpdated: new Date().toISOString()
         };
       });
     }
-  }, [liveDensity]);
+  }, [liveDensity, snapshot]);
 
   const navItems = [
-    { id: 'overview', name: 'Overview', icon: LayoutDashboard },
-    { id: 'heatmap', name: 'Zone Intel', icon: MapIcon },
-    { id: 'queues', name: 'Queues', icon: Scale },
-    { id: 'alerts', name: 'Incidents', icon: Bell },
-    { id: 'staff', name: 'Coordination', icon: Users },
+    { id: 'overview', name: 'Dashboard', icon: LayoutDashboard, href: '/operations' },
+    { id: 'incidents', name: 'Incidents', icon: Bell, href: '/operations/incidents' },
+    { id: 'staff', name: 'Staff', icon: Users, href: '/operations/staff' },
+    { id: 'monitoring', name: 'Monitoring', icon: HistoryIcon, href: '/operations/monitoring' },
   ];
 
   return (
@@ -104,24 +100,27 @@ export default function OperationsDashboard() {
         </div>
 
         <nav className="flex-1 px-4 space-y-3 relative">
-          {navItems.map(item => (
-            <button
-              key={item.id}
-              onClick={() => setActiveView(item.id as ViewMode)}
-              className={cn(
-                "w-full flex items-center gap-4 p-4 rounded-xl transition-all relative group overflow-hidden",
-                activeView === item.id 
-                  ? "bg-primary shadow-[0_0_30px_var(--primary-glow)] text-background" 
-                  : "text-stealth-400 hover:bg-white/5 hover:text-white"
-              )}
-            >
-              <item.icon className={cn("h-5 w-5 relative z-10", activeView === item.id ? "text-background" : "group-hover:text-primary transition-colors")} />
-              {isSidebarOpen && <span className="text-[10px] font-black uppercase tracking-[0.2em] relative z-10">{item.name}</span>}
-              {activeView === item.id && (
-                <motion.div layoutId="nav-active" className="absolute inset-0 bg-primary" transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }} />
-              )}
-            </button>
-          ))}
+          {navItems.map(item => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={cn(
+                  "w-full flex items-center gap-4 p-4 rounded-xl transition-all relative group overflow-hidden",
+                  isActive 
+                    ? "bg-primary shadow-[0_0_30px_var(--primary-glow)] text-background" 
+                    : "text-stealth-400 hover:bg-white/5 hover:text-white"
+                )}
+              >
+                <item.icon className={cn("h-5 w-5 relative z-10", isActive ? "text-background" : "group-hover:text-primary transition-colors")} />
+                {isSidebarOpen && <span className="text-[10px] font-black uppercase tracking-[0.2em] relative z-10">{item.name}</span>}
+                {isActive && (
+                  <motion.div layoutId="nav-active" className="absolute inset-0 bg-primary" transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }} />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="p-6 relative">
@@ -188,7 +187,6 @@ export default function OperationsDashboard() {
         {/* View Surface - Fluid Transitions */}
         <div className="flex-1 relative overflow-hidden bg-background/50 backdrop-blur-sm">
           <AnimatePresence mode="wait">
-            {activeView === 'overview' && (
               <motion.div 
                 key="overview"
                 initial={{ opacity: 0, x: 20 }}
@@ -204,7 +202,7 @@ export default function OperationsDashboard() {
                       <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4">Neural Heat Signature</p>
                       <div className="h-48 relative overflow-hidden rounded-xl border border-white/5 bg-black/40 backdrop-blur-md p-4">
                          <div className="grid grid-cols-2 gap-3 h-full">
-                            {snapshot?.zones.slice(0, 4).map(z => (
+                            {snapshot && Object.values(snapshot.zones).slice(0, 4).map(z => (
                                <div key={z.zoneId} className="bg-white/[0.02] border border-white/5 p-3 flex flex-col justify-between rounded-lg">
                                   <span className="text-[9px] font-black font-mono text-stealth-500 uppercase">{z.zoneId}</span>
                                   <div className="flex items-baseline gap-2">
@@ -251,47 +249,6 @@ export default function OperationsDashboard() {
                    <AlertCenter />
                 </div>
               </motion.div>
-            )}
-
-            {activeView === 'heatmap' && (
-              <motion.div 
-                key="heatmap"
-                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05 }}
-                className="h-full"
-              >
-                <LiveCrowdDashboard />
-              </motion.div>
-            )}
-
-            {activeView === 'queues' && (
-              <motion.div 
-                key="queues"
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                className="h-full"
-              >
-                <QueueManagementPanel />
-              </motion.div>
-            )}
-
-            {activeView === 'alerts' && (
-              <motion.div 
-                key="alerts"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="p-10 h-full overflow-y-auto"
-              >
-                <StaffAlertPanel />
-              </motion.div>
-            )}
-
-            {activeView === 'staff' && (
-              <motion.div 
-                key="staff"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="h-full"
-              >
-                <StaffCoordinationView />
-              </motion.div>
-            )}
           </AnimatePresence>
         </div>
 

@@ -11,6 +11,10 @@ env:
   SERVICE_NAME: crowdflow-platform
   DOCKER_IMAGE: asia-south1-docker.pkg.dev/prompt-wars-493611/crowdflow/platform
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest

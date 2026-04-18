@@ -1,153 +1,133 @@
 'use client';
 
-import React, { useState } from 'react';
-import CrowdHeatmap from '@/components/attendee/CrowdHeatmap';
-import QueueDisplay from '@/components/attendee/QueueDisplay';
-import WayfindingPane from '@/components/attendee/WayfindingPane';
-import AIAssistantChat from '@/components/attendee/AIAssistantChat';
-import { NotificationCenter } from '@/components/attendee/NotificationCenter';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, ShieldCheck, Cpu, Map as MapIcon, Scale, MessageSquare, Compass, Bell } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-type TabMode = 'map' | 'queues' | 'ai' | 'nav' | 'alerts';
+import React from 'react';
+import LuminaMap from '@/components/attendee/LuminaMap';
+import { motion } from 'framer-motion';
+import { 
+  Zap, 
+  MapPin, 
+  Users, 
+  Clock, 
+  MessageSquare, 
+  ArrowRight,
+  TrendingUp,
+  Heart
+} from 'lucide-react';
+import Link from 'next/link';
 
 export default function AttendeeDashboard() {
-  const [activeTab, setActiveTab] = useState<TabMode>('map');
-
-  const tabs = [
-    { id: 'map', icon: MapIcon, label: 'Map' },
-    { id: 'queues', icon: Scale, label: 'Queues' },
-    { id: 'ai', icon: MessageSquare, label: 'Assistant' },
-    { id: 'alerts', icon: Bell, label: 'Alerts' },
-    { id: 'nav', icon: Compass, label: 'Directions' },
-  ];
-
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col overflow-x-hidden selection:bg-primary selection:text-background relative">
-      {/* Premium Background Atmosphere */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")' }} />
-      </div>
-
-      {/* Dynamic Header - Refined Premium */}
-      <header className="border-b border-white/5 py-6 px-8 md:px-16 flex justify-between items-center glass-panel sticky top-0 z-50 backdrop-blur-2xl">
-        <div className="flex items-center gap-4 group cursor-pointer">
-          <div className="bg-primary p-2 rounded-xl shadow-[0_0_25px_var(--primary-glow)] group-hover:scale-110 transition-transform duration-500">
-            <Zap className="h-6 w-6 text-background" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-black uppercase tracking-tighter leading-none">
-              Crowd<span className="text-primary italic">Flow</span>
-            </h1>
-            <p className="text-[8px] text-stealth-500 font-bold tracking-[0.4em] uppercase mt-1">Intelligent Operations</p>
-          </div>
+    <div className="space-y-12 pb-24">
+      {/* Welcome Hero - Editorial Grade */}
+      <header className="space-y-4">
+        <div className="flex items-center gap-3">
+           <div className="bg-primary p-2 rounded-lg">
+              <Zap className="h-4 w-4 text-background" />
+           </div>
+           <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Venue Status: Optimal</span>
         </div>
-        
-        <div className="hidden md:flex gap-8 items-center">
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary">
-              <ShieldCheck className="h-4 w-4" />
-              Quantum-Secure
-            </div>
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-secondary mt-1">
-              <Cpu className="h-4 w-4" />
-              Engine: Active
-            </div>
-          </div>
-        </div>
+        <h2 className="text-5xl font-black tracking-tighter uppercase leading-none">Your <span className="text-primary italic">Atmosphere</span></h2>
+        <p className="text-stealth-400 text-lg font-medium leading-relaxed max-w-2xl">
+          Experience a frictionless journey. We've optimized your route based on real-time crowd dynamics and neural session mapping.
+        </p>
       </header>
 
-      {/* Desktop Grid Layout */}
-      <div className="hidden lg:grid grid-cols-12 gap-10 p-10 md:p-16 flex-1 relative z-10">
-        <div className="col-span-8 space-y-12">
-          <section className="reveal">
-            <CrowdHeatmap />
-          </section>
-          <section className="reveal" style={{ animationDelay: '0.2s' }}>
-            <QueueDisplay />
-          </section>
-        </div>
+      {/* Primary Intelligence Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        {/* Left Column: Schedule & Quick Intel */}
+        <div className="lg:col-span-4 space-y-10">
+          
+          {/* Next Up Widget */}
+          <div className="bg-foreground text-white rounded-[2.5rem] p-10 shadow-2xl shadow-foreground/20 relative overflow-hidden group">
+             <div className="relative z-10 space-y-6">
+                <div className="flex justify-between items-start">
+                   <div className="px-4 py-1.5 bg-primary/20 border border-primary/30 rounded-full">
+                      <span className="text-[8px] font-black uppercase tracking-widest text-primary">Next Up in 15m</span>
+                   </div>
+                   <Clock className="h-5 w-5 text-primary/40" />
+                </div>
+                <h3 className="text-3xl font-black tracking-tighter uppercase leading-tight">Future of Neural Architectures</h3>
+                <p className="text-[11px] font-bold text-white/50 uppercase tracking-widest flex items-center gap-3">
+                   <span>Dr. Elena Vance</span>
+                   <span className="opacity-20">//</span>
+                   <span>Ballroom A</span>
+                </p>
+                <Link href="/dashboard/schedule" className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-primary group-hover:gap-5 transition-all">
+                   View Full Schedule <ArrowRight className="h-4 w-4" />
+                </Link>
+             </div>
+             <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px]" />
+          </div>
 
-        <div className="col-span-4 space-y-10">
-          <div className="sticky top-32 space-y-10">
-            <section className="reveal" style={{ animationDelay: '0.4s' }}>
-              <AIAssistantChat />
-            </section>
-            <section className="reveal" style={{ animationDelay: '0.6s' }}>
-              <NotificationCenter />
-            </section>
-            <section className="reveal" style={{ animationDelay: '0.8s' }}>
-              <WayfindingPane />
-            </section>
+          {/* Quick Metrics Stack */}
+          <div className="space-y-6">
+             <div className="bg-white rounded-[2.5rem] border border-card-border p-8 flex items-center justify-between shadow-sm hover:shadow-xl hover:shadow-black/[0.02] transition-all">
+                <div className="flex items-center gap-5">
+                   <div className="bg-stealth-100 p-4 rounded-3xl">
+                      <Users className="h-6 w-6 text-stealth-400" />
+                   </div>
+                   <div>
+                      <p className="text-[9px] font-black text-stealth-400 uppercase tracking-widest mb-1">Global Saturation</p>
+                      <p className="text-xl font-black tracking-tighter uppercase">Nominal (24%)</p>
+                   </div>
+                </div>
+                <TrendingUp className="h-5 w-5 text-primary" />
+             </div>
+
+             <div className="bg-white rounded-[2.5rem] border border-card-border p-8 flex items-center justify-between shadow-sm hover:shadow-xl hover:shadow-black/[0.02] transition-all">
+                <div className="flex items-center gap-5">
+                   <div className="bg-stealth-100 p-4 rounded-3xl">
+                      <Heart className="h-6 w-6 text-stealth-400" />
+                   </div>
+                   <div>
+                      <p className="text-[9px] font-black text-stealth-400 uppercase tracking-widest mb-1">Queue Comfort</p>
+                      <p className="text-xl font-black tracking-tighter uppercase">High Speed</p>
+                   </div>
+                </div>
+                <Zap className="h-5 w-5 text-primary" />
+             </div>
+          </div>
+
+          {/* Assistant Quick Entry */}
+          <div className="bg-white rounded-[2.5rem] border border-card-border p-10 space-y-6 shadow-sm">
+             <div className="flex items-center gap-3">
+                <MessageSquare className="h-4 w-4 text-primary" />
+                <h4 className="text-[10px] font-black tracking-[0.3em] uppercase">Neural Assistant</h4>
+             </div>
+             <p className="text-xs font-medium leading-relaxed text-stealth-500">
+                Ask about the fastest route to the Coffee Lab or check workshop availability.
+             </p>
+             <Link href="/assistant">
+                <button className="w-full py-5 bg-stealth-100 text-foreground rounded-2xl font-black uppercase tracking-widest text-[9px] hover:bg-primary transition-all duration-300">
+                   Open Assistant Chat
+                </button>
+             </Link>
           </div>
         </div>
-      </div>
 
-      {/* Mobile/Tablet Tabbed Layout */}
-      <div className="lg:hidden flex-1 flex flex-col relative z-10">
-        <div className="flex-1 p-6 pb-32 overflow-y-auto custom-scrollbar">
-          <AnimatePresence mode="wait">
-            <motion.section 
-              key={activeTab}
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="w-full"
-            >
-              {activeTab === 'map' && <CrowdHeatmap />}
-              {activeTab === 'queues' && <QueueDisplay />}
-              {activeTab === 'ai' && <AIAssistantChat />}
-              {activeTab === 'alerts' && <NotificationCenter />}
-              {activeTab === 'nav' && <WayfindingPane />}
-            </motion.section>
-          </AnimatePresence>
-        </div>
-
-        {/* Bottom Navigation Bar - Glassmorphic Pill */}
-        <div className="fixed bottom-8 left-4 right-4 z-50 flex justify-center">
-          <nav className="bg-white/5 backdrop-blur-3xl border border-white/10 px-6 py-3 rounded-full flex justify-around items-center gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as TabMode)}
-                className={cn(
-                  "relative flex flex-col items-center gap-1.5 px-4 py-2 rounded-full transition-all group",
-                  activeTab === tab.id ? "text-primary" : "text-stealth-400 hover:text-stealth-200"
-                )}
-              >
-                {activeTab === tab.id && (
-                  <motion.div 
-                    layoutId="tab-active" 
-                    className="absolute inset-0 bg-primary/10 rounded-full" 
-                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }} 
-                  />
-                )}
-                <tab.icon className={cn("h-5 w-5 relative z-10 transition-transform duration-300", activeTab === tab.id && "scale-110")} />
-                <span className="text-[8px] font-black uppercase tracking-widest relative z-10">{tab.label}</span>
-              </button>
-            ))}
-          </nav>
+        {/* Right Column: Mini Map View */}
+        <div className="lg:col-span-8 flex flex-col gap-6">
+           <div className="flex-1 bg-white rounded-[2.5rem] border border-card-border p-3 shadow-sm hover:shadow-2xl hover:shadow-black/[0.02] transition-all relative group overflow-hidden">
+              <div className="absolute top-10 left-10 z-10 flex items-center gap-3">
+                 <div className="bg-white/80 backdrop-blur-xl border border-card-border px-4 py-2 rounded-full flex items-center gap-3 shadow-sm">
+                    <MapPin className="h-3 w-3 text-primary" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-stealth-400">Live Spatial Feed</span>
+                 </div>
+              </div>
+              <div className="h-full min-h-[400px]">
+                 <LuminaMap />
+              </div>
+              <div className="absolute bottom-10 right-10 z-10">
+                 <Link href="/dashboard/map">
+                    <button className="px-8 py-4 bg-foreground text-white rounded-2xl font-black uppercase tracking-widest text-[9px] hover:bg-primary hover:text-foreground transition-all duration-300 shadow-2xl shadow-foreground/20">
+                       Full Screen Wayfinding
+                    </button>
+                 </Link>
+              </div>
+           </div>
         </div>
       </div>
-
-      {/* Kinetic Footer */}
-      <footer className="hidden lg:block border-t border-white/5 py-10 px-16 text-center text-stealth-500 relative z-10">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-stealth-400/20 to-transparent" />
-          <p className="text-[9px] font-black uppercase tracking-[0.4em]">
-            &copy; 2026 CrowdFlow Neural Core &bull; Node: asia-south1-p1 &bull; Status: Optimized
-          </p>
-        </div>
-      </footer>
-    </main>
+    </div>
   );
 }

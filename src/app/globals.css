@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
   --background: #050505;
@@ -23,6 +23,28 @@
   --radius-sharp: 2px;
   --radius-md: 6px;
   --radius-lg: 12px;
+}
+
+.lumina-flow {
+  --background: #fbfbfc;
+  --foreground: #09090b;
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.04);
+  
+  --primary: #14ffd8;
+  --primary-glow: rgba(20, 255, 216, 0.1);
+  --secondary: #6366f1; /* Indigo for a softer look */
+  --alert: #f97316;
+  --critical: #ef4444;
+  
+  --stealth-100: #f4f4f5;
+  --stealth-200: #e4e4e7;
+  --stealth-300: #d4d4d8;
+  --stealth-400: #a1a1aa;
+  
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  
+  cursor: default !important;
 }
 
 * {
@@ -142,6 +164,7 @@ body::before {
 .text-gradient {
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 900;
 }
