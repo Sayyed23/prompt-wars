@@ -100,17 +100,17 @@ export default function AIAssistantChat() {
 
   return (
     <div className="w-full max-w-lg mx-auto p-4 md:p-8">
-      <div className="glass-panel kinetic-border flex flex-col h-[600px] overflow-hidden">
+      <div className="glass-panel quantum-card-glow kinetic-border flex flex-col h-[600px] overflow-hidden rounded-2xl shadow-2xl">
         {/* Header */}
-        <div className="p-4 border-b border-white/5 flex justify-between items-center bg-stealth-100/30">
+        <div className="p-4 border-b border-white/5 flex justify-between items-center bg-stealth-100/50 backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-sm">
+            <div className="p-2 bg-primary/20 rounded-md border border-primary/30">
               <Bot className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-[10px] text-stealth-300 uppercase font-bold tracking-widest">Sentinel AI</p>
-              <h2 className="text-sm font-bold uppercase tracking-tight flex items-center gap-1.5">
-                Venue Assistant <Sparkles className="h-3 w-3 text-primary" />
+              <p className="text-[10px] text-primary font-bold uppercase tracking-[0.2em] animate-pulse">Sentinel_Uplink</p>
+              <h2 className="text-sm font-bold uppercase tracking-tight flex items-center gap-1.5 text-white">
+                Venue Intelligence <Sparkles className="h-3 w-3 text-secondary" />
               </h2>
             </div>
           </div>
@@ -164,16 +164,18 @@ export default function AIAssistantChat() {
                   {msg.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4 text-primary" />}
                 </div>
                 <div className={cn(
-                  "max-w-[80%] p-3 rounded-sm text-sm leading-relaxed",
-                  msg.role === 'user' ? "bg-stealth-100/50 text-right" : "glass-panel bg-white/5"
+                  "max-w-[85%] p-4 rounded-xl text-sm leading-relaxed shadow-lg transition-all",
+                  msg.role === 'user' 
+                    ? "bg-primary/20 border border-primary/30 text-white rounded-tr-none text-right" 
+                    : "glass-panel bg-white/5 border border-white/10 rounded-tl-none text-left"
                 )}>
                   <span className="sr-only">{msg.role === 'user' ? 'You said:' : 'Assistant says:'}</span>
                   {msg.content || (isTyping && i === messages.length - 1 && (
-                    <span className="flex gap-1" aria-label="Typing...">
-                      <span className="animate-bounce" aria-hidden="true">.</span>
-                      <span className="animate-bounce delay-75" aria-hidden="true">.</span>
-                      <span className="animate-bounce delay-150" aria-hidden="true">.</span>
-                    </span>
+                    <div className="flex items-center gap-2 py-1" aria-label="Processing logic...">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse delay-150" />
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse delay-300" />
+                    </div>
                   ))}
                 </div>
               </motion.div>

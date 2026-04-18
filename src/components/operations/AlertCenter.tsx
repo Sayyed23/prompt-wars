@@ -76,8 +76,8 @@ export default function AlertCenter() {
   };
 
   return (
-    <div className="w-full flex flex-col h-full glass-panel kinetic-border overflow-hidden">
-      <div className="p-4 border-b border-white/5 flex justify-between items-center bg-stealth-100/30">
+    <div className="w-full flex flex-col h-full glass-panel quantum-card-glow overflow-hidden">
+      <div className="p-4 border-b border-white/5 flex justify-between items-center bg-stealth-100/50 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-alert/10 rounded-sm">
             <Bell className="h-5 w-5 text-alert" />
@@ -126,8 +126,9 @@ export default function AlertCenter() {
                   role="article"
                   aria-label={ariaLabel}
                   className={cn(
-                    "p-4 border-l-4 rounded-sm flex flex-col gap-3 group relative outline-none focus-within:ring-2 focus-within:ring-primary",
-                    getPriorityStyles(alert.priority)
+                    "p-4 border-l-4 rounded-sm flex flex-col gap-3 group relative outline-none focus-within:ring-2 focus-within:ring-primary transition-all duration-300",
+                    getPriorityStyles(alert.priority),
+                    alert.priority === AlertPriority.CRITICAL && "animate-quantum-pulse shadow-[0_0_15px_rgba(255,0,60,0.2)]"
                   )}
                 >
                   <div className="flex justify-between items-start">

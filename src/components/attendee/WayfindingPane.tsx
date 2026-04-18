@@ -40,10 +40,10 @@ export default function WayfindingPane() {
 
   return (
     <div className="w-full max-w-lg mx-auto p-4 md:p-8 space-y-6">
-      <div className="glass-panel p-6 kinetic-border">
-        <h2 className="text-xl font-bold uppercase tracking-tight mb-6 flex items-center gap-2">
-          <Navigation2 className="h-5 w-5 text-primary" />
-          Wayfinding
+      <div className="glass-panel quantum-card-glow p-6 kinetic-border rounded-xl">
+        <h2 className="text-xl font-bold uppercase tracking-widest mb-6 flex items-center gap-2 text-white">
+          <Navigation2 className="h-5 w-5 text-primary animate-pulse" />
+          Wayfinding_Engine
         </h2>
 
         <div className="space-y-4">
@@ -77,9 +77,14 @@ export default function WayfindingPane() {
             onClick={handleFindRoute}
             disabled={loading || !origin || !destination}
             aria-label={loading ? "Calculating route..." : "Calculate optimized route"}
-            className="w-full py-3 bg-primary text-background font-bold uppercase tracking-widest text-xs hover:bg-white transition-colors disabled:opacity-30 flex justify-center items-center gap-2 outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+            className="w-full py-4 bg-primary text-background font-bold uppercase tracking-widest text-[10px] hover:bg-white transition-all duration-300 disabled:opacity-30 flex justify-center items-center gap-2 outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background group"
           >
-            {loading ? <Search className="h-4 w-4 animate-spin" /> : 'Calculate Route'}
+            {loading ? <Search className="h-4 w-4 animate-spin" /> : (
+              <>
+                Initialize Path
+                <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -90,7 +95,7 @@ export default function WayfindingPane() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="glass-panel p-6 kinetic-border space-y-6"
+            className="glass-panel quantum-card-glow p-6 kinetic-border space-y-6 rounded-xl border-white/10"
             role="region"
             aria-label="Wayfinding Path Details"
             aria-live="polite"

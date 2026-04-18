@@ -63,9 +63,9 @@ export default function LiveCrowdDashboard() {
   const globalSaturation = totalCapacity > 0 ? (totalOccupancy / totalCapacity) * 100 : 0;
 
   return (
-    <div className="flex flex-col h-full bg-stealth-900 overflow-hidden">
+    <div className="flex flex-col h-full bg-stealth-900/50 overflow-hidden relative">
       {/* Top Header Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 border-b border-white/5 bg-stealth-100/30 backdrop-blur-md">
+      <div className="grid grid-cols-2 md:grid-cols-4 border-b border-white/5 bg-stealth-100/50 backdrop-blur-md relative z-10">
         <div className="p-4 border-r border-white/5">
           <p className="text-[10px] text-stealth-400 font-bold uppercase tracking-widest mb-1">Global Saturation</p>
           <div className="flex items-center gap-3">
@@ -106,10 +106,11 @@ export default function LiveCrowdDashboard() {
           </div>
         </div>
 
-        <div className="p-4 bg-primary/5">
-          <p className="text-[10px] text-primary/70 font-bold uppercase tracking-widest mb-1 italic">Last Update</p>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-primary" />
+        <div className="p-4 bg-primary/5 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <p className="text-[10px] text-primary/70 font-bold uppercase tracking-widest mb-1 italic relative z-10">Last Update</p>
+          <div className="flex items-center gap-2 relative z-10">
+            <Clock className="h-4 w-4 text-primary animate-pulse" />
             <span className="text-lg font-mono font-bold text-primary">
               {snapshot ? new Date(snapshot.lastUpdated || snapshot.timestamp).toLocaleTimeString() : '--:--:--'}
             </span>
@@ -205,8 +206,11 @@ export default function LiveCrowdDashboard() {
           </div>
         </div>
 
-        {/* Sidebar Zone List */}
-        <div className="w-80 border-l border-white/5 bg-stealth-100/20 flex flex-col">
+        {/* Sidebar Zone List - Hidden on desktop small, collapsible logic can be added or just ensure space */}
+        <div className={cn(
+          "w-80 border-l border-white/5 bg-stealth-100/40 backdrop-blur-xl flex flex-col transition-all duration-500",
+          "hidden xl:flex" // Only show side-by-side on large screens
+        )}>
           <div className="p-4 border-b border-white/5 flex justify-between items-center">
             <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
               <div className="w-1 h-3 bg-primary" />
@@ -267,14 +271,14 @@ export default function LiveCrowdDashboard() {
             })}
           </div>
 
-          {/* Drill-down Detail Modal Overlay (Inside Sidebar for layout) */}
+          {/* Drill-down Detail Modal Overlay - Refactored for responsiveness */}
           <AnimatePresence>
             {selectedZone && (
               <motion.div
                 initial={{ opacity: 0, y: 100 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 100 }}
-                className="absolute bottom-0 right-80 left-0 glass-panel m-4 p-6 border-white/10 z-20 overflow-hidden"
+                className="absolute bottom-0 inset-x-0 xl:right-80 glass-panel m-4 p-4 md:p-6 border-white/10 z-40 overflow-hidden shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
               >
                 <div className="flex justify-between items-start mb-6">
                   <div>

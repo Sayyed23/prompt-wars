@@ -63,22 +63,22 @@ export const StaffAlertPanel: React.FC = () => {
   const assignedAlerts = alerts.filter(a => a.assignedStaffIds.includes(staffId) || a.status === AlertStatus.UNASSIGNED);
 
   return (
-    <div className="bg-[#0A0C10] border border-[#1A1D23] rounded-xl overflow-hidden shadow-2xl w-full h-full flex flex-col font-mono">
+    <div className="glass-panel quantum-card-glow rounded-xl overflow-hidden shadow-2xl w-full h-full flex flex-col font-sans">
       {/* Header */}
-      <div className="bg-[#11141B] p-4 border-b border-[#1A1D23] flex items-center justify-between">
+      <div className="bg-stealth-100/50 p-4 border-b border-white/5 flex items-center justify-between backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#00F5FF]/10 flex items-center justify-center border border-[#00F5FF]/20">
-            <UserCheck className="w-4 h-4 text-[#00F5FF]" />
+          <div className="w-8 h-8 rounded-sm bg-primary/10 flex items-center justify-center border border-primary/20">
+            <UserCheck className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h2 className="text-white font-bold text-sm tracking-tight">GROUND_UNIT_ALPHA</h2>
-            <p className="text-[#3F444E] text-[10px]">ID: {staffId} | STATUS: ACTIVE</p>
+            <h2 className="text-white font-bold text-xs uppercase tracking-widest">Ground_Unit_Alpha</h2>
+            <p className="text-stealth-400 text-[10px]">ID: {staffId} | STATUS: <span className="text-primary font-bold">ACTIVE</span></p>
           </div>
         </div>
         <div className="flex items-center gap-4 text-[10px]">
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#00F5FF] animate-pulse" />
-            <span className="text-[#8E929B]">COMMS_LINK</span>
+          <div className="flex items-center gap-2 px-2 py-1 bg-stealth-300/30 rounded-sm">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="text-stealth-300 font-mono font-bold tracking-tighter uppercase">COMMS_LINK</span>
           </div>
         </div>
       </div>
@@ -106,16 +106,16 @@ export const StaffAlertPanel: React.FC = () => {
                   </span>
                 </div>
 
-                <h3 className="text-white font-bold text-sm mb-1">{alert.description}</h3>
+                <h3 className="text-white font-bold text-sm mb-1 leading-tight">{alert.description}</h3>
                 
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4">
-                  <div className="flex items-center gap-1.5 text-[#8E929B] text-[10px]">
-                    <MapPin className="w-3 h-3" />
+                  <div className="flex items-center gap-1.5 text-stealth-300 text-[10px] font-bold">
+                    <MapPin className="w-3 h-3 text-primary" />
                     <span>{alert.locationName}</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[#8E929B] text-[10px]">
-                    <Navigation className="w-3 h-3" />
-                    <span className="text-[#00F5FF] underline cursor-pointer">ROUTE_TO_ZONE</span>
+                  <div className="flex items-center gap-1.5 text-stealth-300 text-[10px] font-bold">
+                    <Navigation className="w-3 h-3 text-primary" />
+                    <span className="text-primary underline cursor-pointer hover:text-white transition-colors">ROUTE_TO_ZONE</span>
                   </div>
                 </div>
 
@@ -172,10 +172,10 @@ export const StaffAlertPanel: React.FC = () => {
       </div>
 
       {/* Footer / Location Sync */}
-      <div className="bg-[#11141B] p-3 border-t border-[#1A1D23]">
-        <div className="flex items-center justify-between text-[10px]">
-          <span className="text-[#3F444E]">GEO_POS_LOCK:</span>
-          <span className="text-[#00F5FF]">ZONE_NORTH_STAND_LOWER</span>
+      <div className="bg-stealth-100/50 p-3 border-t border-white/5 backdrop-blur-sm">
+        <div className="flex items-center justify-between text-[10px] font-bold">
+          <span className="text-stealth-400 uppercase tracking-tighter">Geo_Pos_Lock:</span>
+          <span className="text-primary font-mono tracking-widest">ZONE_NORTH_STAND_LOWER</span>
         </div>
       </div>
     </div>
